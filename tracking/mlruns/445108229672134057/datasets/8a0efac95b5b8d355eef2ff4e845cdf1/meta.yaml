@@ -1,0 +1,10 @@
+digest: 2bfacbe0
+name: dataset
+profile: '{"num_rows": 100, "num_elements": 500}'
+schema: '{"mlflow_colspec": [{"type": "double", "name": "feature_0", "required": true},
+  {"type": "double", "name": "feature_1", "required": true}, {"type": "double", "name":
+  "feature_2", "required": true}, {"type": "double", "name": "feature_3", "required":
+  true}, {"type": "double", "name": "feature_4", "required": true}]}'
+source: '{"tags": {"mlflow.user": "jules", "mlflow.source.name": "simple_tracking_basic.py",
+  "mlflow.source.type": "LOCAL", "mlflow.source.git.commit": "9e897244466944ab80a9715ea2b6dbeb780e78a7"}}'
+source_type: code

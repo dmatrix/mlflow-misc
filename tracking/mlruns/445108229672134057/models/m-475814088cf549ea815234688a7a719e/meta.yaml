@@ -1,0 +1,10 @@
+artifact_location: file:///Users/jules/git-repos/mlflow-misc/tracking/mlruns/445108229672134057/models/m-475814088cf549ea815234688a7a719e/artifacts
+creation_timestamp: 1756406832356
+experiment_id: '445108229672134057'
+last_updated_timestamp: 1756406833493
+model_id: m-475814088cf549ea815234688a7a719e
+model_type: null
+name: model
+source_run_id: 199979c812f844b4aeb4f156fe79180a
+status: 2
+status_message: null
