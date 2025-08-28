@@ -31,6 +31,8 @@ pip install mlflow scikit-learn pandas numpy matplotlib seaborn
 ```
 
 ### Run the Example
+
+#### **Basic Usage (File Store)**
 ```bash
 # Using entry point
 uv run mlflow-tracking-example
@@ -38,6 +40,39 @@ uv run mlflow-tracking-example
 # Or directly
 python tracking/simple_tracking_basic.py
 ```
+
+#### **SQLite Database Backend**
+```bash
+# Use SQLite database for tracking
+python tracking/simple_tracking_basic.py --backend sqlite --db-path ./mlflow.db
+
+# Custom database location
+python tracking/simple_tracking_basic.py --backend sqlite --db-path /path/to/my/experiments.db
+```
+
+#### **Custom Tracking URI**
+```bash
+# Direct SQLite URI
+python tracking/simple_tracking_basic.py --tracking-uri sqlite:///path/to/mlflow.db
+
+# Remote MLflow server
+python tracking/simple_tracking_basic.py --tracking-uri http://localhost:5000
+
+# Custom experiment name
+python tracking/simple_tracking_basic.py --experiment-name "my-custom-experiment"
+```
+
+#### **Command Line Options**
+```bash
+# View all available options
+python tracking/simple_tracking_basic.py --help
+```
+
+**Available Arguments:**
+- `--backend {file,sqlite}` - Backend store type (default: file)
+- `--db-path DB_PATH` - Path to SQLite database file (default: ./mlflow.db)
+- `--tracking-uri TRACKING_URI` - Custom MLflow tracking URI (overrides other options)
+- `--experiment-name EXPERIMENT_NAME` - MLflow experiment name (default: simple-house-prediction)
 
 ## 📊 What the Example Does
 
@@ -66,6 +101,46 @@ The `simple_tracking_basic.py` demonstrates the **complete MLflow workflow** in 
 ### **6. 🔮 Make Predictions**
 - Uses loaded model for inference on sample data
 - Shows end-to-end workflow completion
+
+## 🗄️ Backend Store Options
+
+### **File Store (Default)**
+- **Best for**: Development, local experiments, getting started
+- **Storage**: Local `./mlruns` directory
+- **Pros**: Simple, no setup required, version control friendly
+- **Cons**: Not suitable for team collaboration or production
+
+### **SQLite Database**
+- **Best for**: Local development with better query performance
+- **Storage**: Single SQLite database file
+- **Pros**: Better performance, SQL queries, atomic operations
+- **Cons**: Single-user, not suitable for concurrent access
+
+```bash
+# SQLite benefits
+python tracking/simple_tracking_basic.py --backend sqlite --db-path ./experiments.db
+```
+
+### **Remote Tracking Server**
+- **Best for**: Team collaboration, production deployments
+- **Storage**: Remote MLflow server with database backend
+- **Pros**: Multi-user, concurrent access, centralized tracking
+- **Cons**: Requires server setup and maintenance
+
+```bash
+# Connect to remote server
+python tracking/simple_tracking_basic.py --tracking-uri http://mlflow-server:5000
+```
+
+### **Backend Store Comparison**
+
+| Feature | File Store | SQLite | Remote Server |
+|---------|------------|---------|---------------|
+| Setup Complexity | ✅ None | ✅ Simple | ❌ Complex |
+| Performance | ⚠️ Moderate | ✅ Good | ✅ Excellent |
+| Multi-user | ❌ No | ❌ No | ✅ Yes |
+| Query Support | ❌ Limited | ✅ Full SQL | ✅ Full SQL |
+| Production Ready | ❌ No | ⚠️ Limited | ✅ Yes |
 
 ## 🤖 MLflow Autolog Benefits
 
@@ -191,12 +266,32 @@ data_gen = loader.load_module("data_generation")
 
 After running the example, explore results in the MLflow UI:
 
+### **File Store Backend**
 ```bash
-# Start MLflow UI
+# Start MLflow UI (default file store)
 mlflow ui
 
 # Visit in browser
 open http://localhost:5000
+```
+
+### **SQLite Backend**
+```bash
+# Start MLflow UI with SQLite database
+mlflow ui --backend-store-uri sqlite:///./mlflow.db
+
+# Or specify custom database path
+mlflow ui --backend-store-uri sqlite:///path/to/your/experiments.db
+
+# Visit in browser
+open http://localhost:5000
+```
+
+### **Remote Server**
+```bash
+# Connect to remote MLflow server
+# No local UI needed - access server directly
+open http://your-mlflow-server:5000
 ```
 
 ### In the MLflow UI you can:
