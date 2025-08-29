@@ -207,7 +207,3 @@ MIT License - See project configuration for details.
 ---
 
 **🎯 Ready to get started?** Jump to [📊 Tracking Examples](./tracking/README.md) for hands-on MLflow tracking with autolog!
-=======
-# mlflow-misc
-All things OSS MLflow and Managed MLflow
-
