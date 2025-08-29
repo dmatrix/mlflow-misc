@@ -1,2 +1,2 @@
 # mlflow-misc
-All things OSS and Managed MLflow
+All things OSS MLflow and Managed MLflow
