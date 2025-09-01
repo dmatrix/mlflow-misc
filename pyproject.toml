@@ -33,7 +33,7 @@ dependencies = [
 
 [project.optional-dependencies]
 spark = [
-    "pyspark>=3.4.0",
+    "pyspark==4.0.0",
 ]
 dev = [
     "pytest>=7.0.0",
