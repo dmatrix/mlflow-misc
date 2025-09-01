@@ -41,6 +41,11 @@ mlflow-misc/
 ├── tracking/                      # MLflow tracking examples & documentation
 │   ├── simple_tracking_basic.py  # Main autolog example with CLI support
 │   └── README.md                  # Comprehensive tracking documentation
+├── spark/                         # Spark MLflow integration examples
+│   ├── spark_synthetic_nyc_taxi_data.py  # Synthetic NYC taxi data with RandomForest
+│   ├── spark_real_nyc_taxi_data.py       # Real NYC taxi data with RandomForest
+│   ├── spark_ml_utils.py          # Common ML functions (training, inference, features)
+│   └── README.md                  # Spark MLflow integration guide
 ├── utils/                         # Reusable MLflow utility modules
 │   ├── mlflow_setup.py           # MLflow configuration & experiment setup
 │   ├── data_generation.py        # Synthetic dataset generation
@@ -67,6 +72,14 @@ mlflow-misc/
 - **SQLite Database** - Better performance for local experiments  
 - **Remote Tracking Server** - Team collaboration and sharing
 - **Command-line interface** for easy backend switching
+
+### **Distributed Computing Support**
+- **Apache Spark Integration** with MLflow hybrid logging (sklearn autolog + manual Spark ML)
+- **RandomForest regression** on both synthetic and real NYC taxi datasets
+- **Refactored Architecture** with common ML utilities eliminating code duplication
+- **Identical logic structure** for easy comparison between synthetic vs real data
+- **Large-scale synthetic data generation** (500K+ rows) and real-world data processing
+- **Scalable ML workflows** with Spark MLlib and proper memory management
 
 ### **Modular Utility System**
 - **Dynamic module loading** using `importlib.util`
@@ -136,6 +149,11 @@ uv sync
 # Run basic example
 uv run mlflow-tracking-example
 
+# Run Spark examples (requires PySpark)
+uv sync --extra spark
+uv run mlflow-spark-synthetic    # Synthetic NYC taxi data
+uv run mlflow-spark-nyc-taxi     # Real NYC taxi data
+
 # View results in MLflow UI
 mlflow ui
 ```
@@ -180,6 +198,7 @@ pipx install uv
 | Component | Description | Link |
 |-----------|-------------|------|
 | **Tracking Examples** | Complete MLflow tracking guide with autolog | [tracking/README.md](./tracking/README.md) |
+| **Spark Integration** | Distributed ML with synthetic & real NYC taxi data | [spark/README.md](./spark/README.md) |
 | **Utility Modules** | Reusable MLflow components and helpers | [utils/](./utils/) |
 | **Project Configuration** | UV setup, dependencies, and entry points | [pyproject.toml](./pyproject.toml) |
 
