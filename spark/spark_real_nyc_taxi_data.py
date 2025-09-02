@@ -41,7 +41,7 @@ from .spark_ml_utils import prepare_features, train_random_forest_model, demonst
 def download_nyc_taxi_data(data_dir: Path, year: int = 2023, month: int = 1) -> Path:
     """
     Download NYC taxi data from the official NYC TLC website.
-    
+
     Args:
         data_dir: Directory to store downloaded data
         year: Year of data to download

@@ -34,6 +34,21 @@ Real-world data example using NYC taxi public dataset:
 
 **⚠️ Memory Management**: The full NYC dataset contains millions of records. For local development, use `--sample-fraction 0.01` (1%) or `0.05` (5%) to avoid memory issues. On a distributed Spark cluster, you can process the full dataset.
 
+### `spark_langchain_sentiment_analysis.py`
+
+Advanced NLP example integrating Spark, LangChain, and MLflow:
+
+- **LangChain Integration**: LLM-powered sentiment analysis with fallback to rule-based methods
+- **Distributed Text Processing**: Scalable text analytics using Spark DataFrames
+- **Synthetic Text Generation**: Configurable dataset with positive, negative, and neutral sentiments
+- **Batch Processing**: Efficient LLM API usage with configurable batch sizes and rate limiting
+- **OpenAI Support**: Optional integration with ChatGPT (requires API key) or mock LLM for testing
+- **Comprehensive Metrics**: Accuracy, confidence scores, sentiment distribution analysis
+- **MLflow NLP Tracking**: Specialized logging for natural language processing workflows
+- **Error Handling**: Robust fallback mechanisms for API failures and network issues
+
+**🤖 LangChain Features**: Supports both OpenAI ChatGPT and mock LLMs for development. Set `OPENAI_API_KEY` environment variable or use `--openai-api-key` flag for real LLM analysis.
+
 ## Identical Logic Structure
 
 Both examples share **identical logic structure** with only the data source being different:
@@ -48,6 +63,58 @@ Both examples share **identical logic structure** with only the data source bein
 ✅ **Same Output Format**: Consistent display with emojis and styling  
 
 This design makes it easy to compare synthetic vs real data processing patterns while learning the same MLflow and Spark concepts.
+
+## Quick Start
+
+### Prerequisites
+```bash
+# Install dependencies
+uv sync --extra spark --extra langchain
+
+# Verify installation
+uv run python -c "import pyspark, mlflow, langchain; print('✅ All dependencies ready')"
+```
+
+### Run Examples
+
+#### **Synthetic Data Example**
+```bash
+# Basic run with default settings (500K rows)
+uv run mlflow-spark-synthetic
+
+# Custom configuration
+uv run mlflow-spark-synthetic --num-rows 100000 --experiment-name "my-synthetic-test"
+```
+
+#### **Real NYC Taxi Data Example**
+```bash
+# Small sample for testing (recommended for local development)
+uv run mlflow-spark-nyc-taxi --sample-fraction 0.01
+
+# Custom configuration
+uv run mlflow-spark-nyc-taxi --sample-fraction 0.005 --experiment-name "nyc-taxi-test"
+```
+
+#### **LangChain Sentiment Analysis Example**
+```bash
+# Basic run with mock LLM (no API key required)
+uv run mlflow-spark-langchain --num-samples 100 --batch-size 20
+
+# With OpenAI API (requires OPENAI_API_KEY environment variable)
+export OPENAI_API_KEY="your-api-key-here"
+uv run mlflow-spark-langchain --num-samples 500 --use-openai --experiment-name "sentiment-openai"
+
+# Custom configuration
+uv run mlflow-spark-langchain --num-samples 200 --batch-size 50 --experiment-name "sentiment-test"
+```
+
+### View Results
+```bash
+# Start MLflow UI
+uv run mlflow ui
+
+# Open browser to http://localhost:5000
+```
 
 ## Utility Modules
 
