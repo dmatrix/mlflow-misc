@@ -177,12 +177,6 @@ def load_and_clean_taxi_data(spark: SparkSession, data_path: Path, sample_fracti
     return df
 
 
-
-
-
-
-
-
 def main():
     """Main execution function."""
     # Set environment variable for Spark autologging compatibility (must be set before Spark session)
