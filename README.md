@@ -44,9 +44,8 @@ mlflow-misc/
 ├── spark/                         # Spark MLflow integration examples
 │   ├── spark_synthetic_nyc_taxi_data.py  # Synthetic NYC taxi data with RandomForest
 │   ├── spark_real_nyc_taxi_data.py       # Real NYC taxi data with RandomForest
-│   ├── spark_langchain_sentiment_analysis.py  # LangChain + Spark NLP sentiment analysis
+│   ├── spark_langchain_simple.py  # Simplified LangChain + Spark sentiment analysis
 │   ├── spark_ml_utils.py          # Common ML functions (training, inference, features)
-│   ├── spark_langchain_utils.py   # LangChain integration utilities
 │   └── README.md                  # Spark MLflow integration guide
 ├── utils/                         # Reusable MLflow utility modules
 │   ├── mlflow_setup.py           # MLflow configuration & experiment setup
@@ -78,11 +77,11 @@ mlflow-misc/
 ### **Distributed Computing Support**
 - **Apache Spark Integration** with MLflow hybrid logging (sklearn autolog + manual Spark ML)
 - **RandomForest regression** on both synthetic and real NYC taxi datasets
-- **LangChain + Spark NLP** integration for distributed text processing and sentiment analysis
 - **Refactored Architecture** with common ML utilities eliminating code duplication
 - **Identical logic structure** for easy comparison between synthetic vs real data
 - **Large-scale synthetic data generation** (500K+ rows) and real-world data processing
 - **Scalable ML workflows** with Spark MLlib and proper memory management
+- **LangChain + Spark UDFs** distributed NLP processing with modern sentiment analysis
 
 ### **Modular Utility System**
 - **Dynamic module loading** using `importlib.util`
@@ -157,7 +156,7 @@ uv sync --extra spark
 uv run mlflow-spark-synthetic    # Synthetic NYC taxi data
 uv run mlflow-spark-nyc-taxi     # Real NYC taxi data
 
-# Run LangChain + Spark NLP example (requires LangChain)
+# Run LangChain + Spark NLP example (simplified)
 uv sync --extra spark --extra langchain
 uv run mlflow-spark-langchain    # Sentiment analysis with LLMs
 
@@ -205,7 +204,7 @@ pipx install uv
 | Component | Description | Link |
 |-----------|-------------|------|
 | **Tracking Examples** | Complete MLflow tracking guide with autolog | [tracking/README.md](./tracking/README.md) |
-| **Spark Integration** | Distributed ML with synthetic & real data + LangChain NLP | [spark/README.md](./spark/README.md) |
+| **Spark Integration** | Distributed ML + simplified LangChain NLP integration | [spark/README.md](./spark/README.md) |
 | **Utility Modules** | Reusable MLflow components and helpers | [utils/](./utils/) |
 | **Project Configuration** | UV setup, dependencies, and entry points | [pyproject.toml](./pyproject.toml) |
 

@@ -34,20 +34,23 @@ Real-world data example using NYC taxi public dataset:
 
 **⚠️ Memory Management**: The full NYC dataset contains millions of records. For local development, use `--sample-fraction 0.01` (1%) or `0.05` (5%) to avoid memory issues. On a distributed Spark cluster, you can process the full dataset.
 
-### `spark_langchain_sentiment_analysis.py`
+### `spark_langchain_simple.py`
 
-Advanced NLP example integrating Spark, LangChain, and MLflow:
+Simplified NLP example integrating Spark, LangChain, and MLflow:
 
-- **LangChain Integration**: LLM-powered sentiment analysis with fallback to rule-based methods
-- **Distributed Text Processing**: Scalable text analytics using Spark DataFrames
-- **Synthetic Text Generation**: Configurable dataset with positive, negative, and neutral sentiments
-- **Batch Processing**: Efficient LLM API usage with configurable batch sizes and rate limiting
-- **OpenAI Support**: Optional integration with ChatGPT (requires API key) or mock LLM for testing
-- **Comprehensive Metrics**: Accuracy, confidence scores, sentiment distribution analysis
-- **MLflow NLP Tracking**: Specialized logging for natural language processing workflows
-- **Error Handling**: Robust fallback mechanisms for API failures and network issues
+- **Clean Integration**: Focused on core Spark + LangChain + MLflow workflow
+- **Distributed Processing**: Uses Spark UDFs for true distributed text processing across cluster
+- **Sentiment Analysis**: Simple LLM-powered text classification using LangChain
+- **MLflow Autologging**: Automatic experiment tracking with minimal manual logging
+- **Utility Functions**: Uses existing project utilities for clean, maintainable code
+- **Mock LLM Support**: Works without OpenAI API key for development and testing
+- **Educational Focus**: Streamlined example without complex feature engineering
+- **No TF-IDF**: Modern LLM approach without traditional NLP preprocessing
+- **Production Ready**: UDF-based architecture scales to large datasets
 
-**🤖 LangChain Features**: Supports both OpenAI ChatGPT and mock LLMs for development. Set `OPENAI_API_KEY` environment variable or use `--openai-api-key` flag for real LLM analysis.
+**🎯 Simplified Approach**: Demonstrates the essential integration patterns without the complexity of traditional feature engineering, making it perfect for learning the core concepts.
+
+**⚡ UDF Architecture**: Uses Spark User Defined Functions (UDFs) to distribute LangChain sentiment analysis across the cluster, enabling processing of large text datasets efficiently.
 
 ## Identical Logic Structure
 
@@ -68,11 +71,14 @@ This design makes it easy to compare synthetic vs real data processing patterns 
 
 ### Prerequisites
 ```bash
-# Install dependencies
+# Install dependencies (Spark only)
+uv sync --extra spark
+
+# Install with LangChain support
 uv sync --extra spark --extra langchain
 
 # Verify installation
-uv run python -c "import pyspark, mlflow, langchain; print('✅ All dependencies ready')"
+uv run python -c "import pyspark, mlflow; print('✅ All dependencies ready')"
 ```
 
 ### Run Examples
@@ -98,20 +104,17 @@ uv run mlflow-spark-nyc-taxi --sample-fraction 0.005 --experiment-name "nyc-taxi
 #### **LangChain Sentiment Analysis Example**
 ```bash
 # Basic run with mock LLM (no API key required)
-uv run mlflow-spark-langchain --num-samples 100 --batch-size 20
+uv run mlflow-spark-langchain --num-samples 50
 
 # With OpenAI API (requires OPENAI_API_KEY environment variable)
 export OPENAI_API_KEY="your-api-key-here"
-uv run mlflow-spark-langchain --num-samples 500 --use-openai --experiment-name "sentiment-openai"
-
-# Custom configuration
-uv run mlflow-spark-langchain --num-samples 200 --batch-size 50 --experiment-name "sentiment-test"
+uv run mlflow-spark-langchain --num-samples 100 --use-openai --experiment-name "sentiment-openai"
 ```
 
 ### View Results
 ```bash
 # Start MLflow UI
-uv run mlflow ui
+uv run mlflow ui 
 
 # Open browser to http://localhost:5000
 ```
