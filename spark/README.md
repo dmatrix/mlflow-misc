@@ -42,7 +42,7 @@ Real-world data example using NYC taxi public dataset:
 - **MLflow LangChain Autologging**: Automatic LLM operation tracking with `mlflow.langchain.autolog()`
 - **ChatOpenAI Client**: Uses ChatOpenAI pointing to Ollama for better MLflow compatibility
 - **Privacy-First**: Complete local processing - no external API keys required
-- **Production Ready**: Tested with 1000+ samples achieving 100% accuracy
+- **Tested Performance**: Comprehensive testing results documented below
 - **Zero Cost**: No per-token charges, completely free local LLM processing
 - **Enhanced Autologging**: Comprehensive MLflow LangChain autolog integration
 - **✅ MLflow Trace Logging**: Automatic capture of LLM requests, responses, token usage, and metadata
@@ -56,7 +56,7 @@ Real-world data example using NYC taxi public dataset:
 - ✅ **No API Keys Required** - Works immediately without external dependencies
 - ✅ **Cleaner Code** - 50% less complexity without multi-LLM branching logic
 - ✅ **Better MLflow Integration** - ChatOpenAI client provides superior autolog support
-- ✅ **Proven Performance** - 100% accuracy on 1000+ samples with perfect reliability
+- ✅ **Proven Performance** - See detailed test results below (Llama3.2: 100%, Mistral: 93-97% accuracy)
 - ✅ **Cost-Free Operation** - Zero ongoing costs compared to cloud LLM APIs
 - ✅ **Single Script Solution** - Everything you need in one clean, maintainable file
 
@@ -116,7 +116,7 @@ uv run mlflow-spark-nyc-taxi --sample-fraction 0.005 --experiment-name "nyc-taxi
 # Streamlined Ollama script with autologging and trace capture
 uv run mlflow-spark-langchain-ollama --ollama-model llama3.2 --num-samples 100
 
-# Large-scale test (proven to work with 1000+ samples)
+# Large-scale test (see performance tables below for detailed results)
 uv run mlflow-spark-langchain-ollama --ollama-model llama3.2 --num-samples 1000
 
 # Different model
@@ -152,7 +152,7 @@ ollama pull llama3.2
 - ✅ No API keys needed - works immediately
 - ✅ Cleaner code - single focused script
 - ✅ Better MLflow integration with autologging
-- ✅ Proven 100% accuracy on 1000+ samples
+- ✅ Comprehensive performance results (see Model Test Results section)
 - ✅ **Complete MLflow trace logging** - automatic capture of LLM requests, responses, token usage, and performance metrics
 - ✅ **Rich trace metadata** - model name, execution duration, system fingerprint, and more
 
@@ -350,20 +350,35 @@ The RandomForest model typically achieves:
 
 Test results for sentiment analysis with different Ollama models:
 
-### Llama3.2 Results
-- 50 samples: 100% accuracy
-- 500 samples: 100% accuracy  
-- 100 samples (multi-mode): 100% accuracy
+### Llama3.2 Performance
 
-### Mistral Results
-- 50 samples: 96.0% accuracy
-- 500 samples: 97.2% accuracy
-- 100 samples (multi-mode): 93.0% accuracy
+| Test Scenario | Samples | Accuracy | Per-Class Performance | MLflow Traces |
+|---------------|---------|----------|----------------------|---------------|
+| Small Scale | 50 | 100% | Positive: 100%, Negative: 100%, Neutral: 100% | ✅ 2 traces |
+| Large Scale | 500 | 100% | Positive: 100%, Negative: 100%, Neutral: 100% | ✅ 2 traces |
+| Multi-Mode | 100 | 100% | Positive: 100%, Negative: 100%, Neutral: 100% | ✅ 1 trace |
 
-**Notes:**
-- Both models support MLflow trace logging
-- Llama3.2 handles neutral sentiment classification better
-- All tests generated proper MLflow traces with token usage and execution metadata
+### Mistral Performance
+
+| Test Scenario | Samples | Accuracy | Per-Class Performance | MLflow Traces |
+|---------------|---------|----------|----------------------|---------------|
+| Small Scale | 50 | 96.0% | Positive: 100%, Negative: 100%, Neutral: 87.5% | ✅ 2 traces |
+| Large Scale | 500 | 97.2% | Positive: 100%, Negative: 100%, Neutral: 91.6% | ✅ 2 traces |
+| Multi-Mode | 100 | 93.0% | Mixed performance across classes | ✅ 1 trace |
+
+### Model Comparison
+
+| Metric | Llama3.2 | Mistral | Notes |
+|--------|----------|---------|-------|
+| Overall Accuracy | 100% | 93-97% | Llama3.2 consistently perfect |
+| Neutral Sentiment | Perfect | Good (87-92%) | Llama3.2 better for neutral classification |
+| Positive/Negative | Perfect | Perfect | Both excellent |
+| MLflow Integration | ✅ Complete | ✅ Complete | Both fully supported with traces |
+
+**Key Findings:**
+- Both models support complete MLflow trace logging with token usage and execution metadata
+- Llama3.2 handles neutral sentiment classification better than Mistral
+- All tests generated proper MLflow traces for experiment tracking
 
 **Usage Examples:**
 ```bash
