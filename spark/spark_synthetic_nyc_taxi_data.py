@@ -76,9 +76,6 @@ def create_synthetic_taxi_data(spark: SparkSession, num_rows: int = 10000):
     return df
 
 
-
-
-
 def main():
     """Main execution function."""
     # Set environment variable for Spark autologging compatibility (must be set before Spark session)
