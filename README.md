@@ -18,9 +18,9 @@ A comprehensive repository demonstrating **modern MLflow practices** for machine
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  EDUCATIONAL RESOURCE + HANDS-ON TUTORIALS                     │
+│  EDUCATIONAL RESOURCE + HANDS-ON TUTORIALS                      │
 │                                                                 │
-│  Perfect for ML Engineers, Data Scientists, and Students who   │
+│  Perfect for ML Engineers, Data Scientists, and Students who    │
 │  want to learn modern MLflow practices through working examples │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -42,11 +42,12 @@ mlflow-misc/
 │   ├── simple_tracking_basic.py  # Main autolog example with CLI support
 │   └── README.md                  # Comprehensive tracking documentation
 ├── spark/                         # Spark MLflow integration examples
-│   ├── spark_synthetic_nyc_taxi_data.py  # Synthetic NYC taxi data with RandomForest
-│   ├── spark_real_nyc_taxi_data.py       # Real NYC taxi data with RandomForest
-│   ├── spark_langchain_simple.py  # Simplified LangChain + Spark sentiment analysis
-│   ├── spark_ml_utils.py          # Common ML functions (training, inference, features)
-│   └── README.md                  # Spark MLflow integration guide
+│   ├── spark_synthetic_nyc_taxi_data.py     # Synthetic NYC taxi data with RandomForest
+│   ├── spark_real_nyc_taxi_data.py          # Real NYC taxi data with RandomForest
+│   ├── spark_langchain_multiple_mode.py     # Multi-LLM sentiment analysis (OpenAI/Ollama/Mock)
+│   ├── spark_langchain_ollama.py            # Streamlined Ollama + Spark + MLflow integration
+│   ├── spark_ml_utils.py                    # Common ML functions (training, inference, features)
+│   └── README.md                            # Spark MLflow integration guide with Ollama setup
 ├── utils/                         # Reusable MLflow utility modules
 │   ├── mlflow_setup.py           # MLflow configuration & experiment setup
 │   ├── data_generation.py        # Synthetic dataset generation
@@ -82,6 +83,7 @@ mlflow-misc/
 - **Large-scale synthetic data generation** (500K+ rows) and real-world data processing
 - **Scalable ML workflows** with Spark MLlib and proper memory management
 - **LangChain + Spark UDFs** distributed NLP processing with modern sentiment analysis
+- **🦙 Ollama Integration** - Local LLM processing with MLflow trace logging (tested with Llama3.2 and Mistral models)
 
 ### **Modular Utility System**
 - **Dynamic module loading** using `importlib.util`
@@ -99,7 +101,7 @@ mlflow-misc/
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    GET STARTED IN 3 STEPS                      │
+│                    GET STARTED IN 3 STEPS                       │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -125,8 +127,8 @@ python tracking/simple_tracking_basic.py --backend sqlite --db-path ./experiment
 
 ```
 ╔══════════════════════════════════════════════════════════════════╗
-║                      60-SECOND SETUP                            ║
-║                   (Optimized for MacBook Pro)                   ║
+║                      60-SECOND SETUP                             ║
+║                   (Optimized for MacBook Pro)                    ║
 ╚══════════════════════════════════════════════════════════════════╝
 ```
 
@@ -156,9 +158,15 @@ uv sync --extra spark
 uv run mlflow-spark-synthetic    # Synthetic NYC taxi data
 uv run mlflow-spark-nyc-taxi     # Real NYC taxi data
 
-# Run LangChain + Spark NLP example (simplified)
+# Run Ollama + Spark + MLflow integration (Simplified - RECOMMENDED)
 uv sync --extra spark --extra langchain
-uv run mlflow-spark-langchain    # Sentiment analysis with LLMs
+
+# Simplified Ollama-only integration (no API keys needed, with MLflow trace logging)
+# First install and setup Ollama: brew install ollama && ollama serve && ollama pull llama3.2
+uv run mlflow-spark-langchain-ollama --ollama-model llama3.2 --num-samples 1000
+
+# Legacy: Multi-LLM script (more complex, conditional autologging for Ollama)
+uv run mlflow-spark-langchain-multiple --llm-type ollama --ollama-model llama3.2 --num-samples 100
 
 # View results in MLflow UI
 mlflow ui
@@ -204,7 +212,8 @@ pipx install uv
 | Component | Description | Link |
 |-----------|-------------|------|
 | **Tracking Examples** | Complete MLflow tracking guide with autolog | [tracking/README.md](./tracking/README.md) |
-| **Spark Integration** | Distributed ML + simplified LangChain NLP integration | [spark/README.md](./spark/README.md) |
+| **Spark Integration** | Distributed ML + LangChain NLP with Ollama models | [spark/README.md](./spark/README.md) |
+| **🦙 Ollama Integration** | Local LLM setup and MLflow trace logging | [spark/README.md](./spark/README.md) |
 | **Utility Modules** | Reusable MLflow components and helpers | [utils/](./utils/) |
 | **Project Configuration** | UV setup, dependencies, and entry points | [pyproject.toml](./pyproject.toml) |
 

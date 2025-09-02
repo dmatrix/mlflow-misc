@@ -38,6 +38,7 @@ langchain = [
     "langchain>=0.3.27",
     "langchain-community>=0.3.29",
     "langchain-openai>=0.3.32",
+    "langchain-ollama>=0.1.0",
 ]
 dev = [
     "pytest>=7.0.0",
@@ -64,7 +65,8 @@ Issues = "https://github.com/jules/mlflow-misc/issues"
 mlflow-tracking-example = "tracking.simple_tracking_basic:main"
 mlflow-spark-synthetic = "spark.spark_synthetic_nyc_taxi_data:main"
 mlflow-spark-nyc-taxi = "spark.spark_real_nyc_taxi_data:main"
-mlflow-spark-langchain = "spark.spark_langchain_simple:main"
+mlflow-spark-langchain-multiple = "spark.spark_langchain_multiple_mode:main"
+mlflow-spark-langchain-ollama = "spark.spark_langchain_ollama:main"
 
 [build-system]
 requires = ["hatchling"]

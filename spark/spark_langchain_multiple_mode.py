@@ -1,13 +1,24 @@
 """
-Simplified Spark + MLflow + LangChain Integration: Sentiment Analysis
+Spark + MLflow + LangChain Integration: Multiple LLM Mode Support
+================================================================
 
-A streamlined example demonstrating:
+A flexible example demonstrating multiple LLM integration options:
 1. Spark for distributed text processing
-2. LangChain for LLM-powered sentiment analysis  
+2. LangChain with multiple LLM backends (Mock/Ollama/OpenAI)
 3. MLflow autologging for experiment tracking
 4. Using existing utility functions for clean, maintainable code
 
-Focus: Core integration without complex feature engineering
+Focus: Educational example showing how to support multiple LLM types
+
+LLM Options:
+- Mock: FakeListLLM (no dependencies, for testing)
+- Ollama: Local LLM processing (privacy-first)
+- OpenAI: Cloud LLM API (requires API key)
+
+Usage:
+    python spark_langchain_multiple_mode.py --llm-type mock --num-samples 50
+    python spark_langchain_multiple_mode.py --llm-type ollama --ollama-model llama3.2
+    python spark_langchain_multiple_mode.py --llm-type openai  # requires OPENAI_API_KEY
 """
 
 import argparse
@@ -21,6 +32,7 @@ sys.path.append(str(Path(__file__).parent.parent / "utils"))
 
 import mlflow
 import mlflow.sklearn
+import mlflow.langchain
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, lit, udf
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType
@@ -29,6 +41,7 @@ from pyspark.sql.types import StructType, StructField, StringType, IntegerType
 try:
     from langchain_community.llms import FakeListLLM
     from langchain_openai import ChatOpenAI
+    from langchain_ollama import OllamaLLM
     LANGCHAIN_AVAILABLE = True
 except ImportError:
     LANGCHAIN_AVAILABLE = False
@@ -81,13 +94,39 @@ def create_sample_text_data(spark: SparkSession, num_samples: int = 100):
     return df
 
 
-def setup_langchain_llm(use_openai: bool = False, api_key: str = None):
-    """Setup LangChain LLM with fallback to mock."""
+def setup_langchain_llm(llm_type: str = "mock", model_name: str = "llama3.2", api_key: str = None, ollama_base_url: str = "http://localhost:11434"):
+    """Setup LangChain LLM with support for Ollama, OpenAI, or mock."""
     
     if not LANGCHAIN_AVAILABLE:
         return None
-        
-    if use_openai and api_key:
+    
+    if llm_type == "ollama":
+        print(f"🦙 Using Ollama model '{model_name}' for sentiment analysis")
+        print(f"🔗 Connecting to Ollama at: {ollama_base_url}")
+        try:
+            # Use ChatOpenAI client pointing to Ollama for better MLflow autolog integration
+            llm = ChatOpenAI(
+                model=model_name,
+                openai_api_base=f"{ollama_base_url}/v1",  # Ollama OpenAI-compatible endpoint
+                openai_api_key="ollama",  # Dummy key (Ollama doesn't require real key)
+                temperature=0.1,
+                max_tokens=10,  # Short responses for sentiment analysis
+                timeout=30
+            )
+            
+            # Test connection
+            print("🧪 Testing Ollama connection...")
+            test_response = llm.invoke("Hello")
+            print(f"✅ Ollama connection successful! Test response: {str(test_response.content)[:50]}...")
+            
+            return llm
+        except Exception as e:
+            print(f"⚠️  Failed to connect to Ollama: {e}")
+            print("💡 Make sure Ollama is running and the model is installed")
+            print(f"   Try: ollama pull {model_name}")
+            return None
+            
+    elif llm_type == "openai" and api_key:
         print("🤖 Using OpenAI ChatGPT for sentiment analysis")
         return ChatOpenAI(
             model="gpt-3.5-turbo",
@@ -119,19 +158,26 @@ def analyze_sentiment_with_langchain(text: str, llm) -> str:
             return 'neutral'
     
     try:
-        prompt = f"Analyze the sentiment of this text and respond with only 'positive', 'negative', or 'neutral': {text}"
+        prompt = f"Analyze the sentiment of this text. Respond with ONLY one word: positive, negative, or neutral.\n\nText: \"{text}\"\n\nSentiment:"
         
         if hasattr(llm, 'invoke'):
             response = llm.invoke(prompt)
+            # Handle ChatOpenAI response format
+            if hasattr(response, 'content'):
+                sentiment = str(response.content).strip().lower()
+            else:
+                sentiment = str(response).strip().lower()
         else:
             response = llm(prompt)
+            sentiment = str(response).strip().lower()
             
-        # Clean response
-        sentiment = str(response).strip().lower()
+        # Extract sentiment from response
         if 'positive' in sentiment:
             return 'positive'
         elif 'negative' in sentiment:
             return 'negative'
+        elif 'neutral' in sentiment:
+            return 'neutral'
         else:
             return 'neutral'
             
@@ -140,7 +186,7 @@ def analyze_sentiment_with_langchain(text: str, llm) -> str:
         return analyze_sentiment_with_langchain(text, None)  # Fallback
 
 
-def process_texts_with_spark_and_langchain(spark, df, llm):
+def process_texts_with_spark_and_langchain(spark, df, llm_config):
     """Process texts using Spark UDFs for distributed LangChain integration."""
     
     print("🔄 Processing texts with Spark UDFs + LangChain...")
@@ -156,11 +202,47 @@ def process_texts_with_spark_and_langchain(spark, df, llm):
         try:
             if text is None or text.strip() == "":
                 return "neutral"
+            
+            # Create LLM instance based on configuration
+            llm = None
+            if llm_config and llm_config['type'] == 'ollama':
+                try:
+                    from langchain_openai import ChatOpenAI
+                    # Use ChatOpenAI client pointing to Ollama for better MLflow integration
+                    llm = ChatOpenAI(
+                        model=llm_config['model'],
+                        openai_api_base=f"{llm_config['base_url']}/v1",
+                        openai_api_key="ollama",
+                        temperature=0.1,
+                        max_tokens=10,
+                        timeout=15
+                    )
+                except ImportError:
+                    pass
+            elif llm_config and llm_config['type'] == 'openai':
+                try:
+                    from langchain_openai import ChatOpenAI
+                    llm = ChatOpenAI(
+                        model="gpt-3.5-turbo",
+                        temperature=0.1,
+                        openai_api_key=llm_config['api_key']
+                    )
+                except ImportError:
+                    pass
+            elif llm_config and llm_config['type'] == 'mock':
+                try:
+                    from langchain_community.llms import FakeListLLM
+                    mock_responses = ["positive", "negative", "neutral"] * 50
+                    llm = FakeListLLM(responses=mock_responses)
+                except ImportError:
+                    pass
+            
             return analyze_sentiment_with_langchain(text, llm)
+            
         except Exception as e:
             # Log error and return neutral as fallback
             print(f"⚠️  UDF error processing text: {e}")
-            return "neutral"
+            return analyze_sentiment_with_langchain(text, None)
     
     # Register the UDF with Spark (optimized for string processing)
     sentiment_udf = udf(sentiment_analysis_udf, StringType())
@@ -201,22 +283,35 @@ def main():
     """Main function demonstrating simplified Spark + MLflow + LangChain integration."""
     
     # Parse arguments
-    parser = argparse.ArgumentParser(description='Simplified Spark + MLflow + LangChain Integration')
+    parser = argparse.ArgumentParser(description='Spark + MLflow + LangChain Integration: Multiple LLM Mode Support')
     parser.add_argument('--num-samples', type=int, default=50,
                        help='Number of text samples (default: 50)')
-    parser.add_argument('--experiment-name', default='spark-langchain-simple',
+    parser.add_argument('--experiment-name', default='spark-langchain-multiple-mode',
                        help='MLflow experiment name')
+    parser.add_argument('--llm-type', choices=['mock', 'ollama', 'openai'], default='mock',
+                       help='LLM type to use (default: mock)')
+    parser.add_argument('--ollama-model', default='llama3.2',
+                       help='Ollama model name (default: llama3.2)')
+    parser.add_argument('--ollama-url', default='http://localhost:11434',
+                       help='Ollama base URL (default: http://localhost:11434)')
     parser.add_argument('--use-openai', action='store_true',
-                       help='Use OpenAI API (requires OPENAI_API_KEY)')
+                       help='Use OpenAI API (requires OPENAI_API_KEY) - DEPRECATED: use --llm-type openai')
     
     args = parser.parse_args()
     
     print("=" * 60)
-    print("🚀 Simplified Spark + MLflow + LangChain Integration")
+    print("🚀 Spark + MLflow + LangChain: Multiple LLM Mode Support")
     print("=" * 60)
     print(f"📊 Samples: {args.num_samples}")
     print(f"🤖 LangChain: {'Available' if LANGCHAIN_AVAILABLE else 'Not available'}")
-    print(f"🔑 OpenAI: {'Yes' if args.use_openai else 'Mock/Demo'}")
+    # Handle deprecated --use-openai flag
+    if args.use_openai:
+        args.llm_type = 'openai'
+    
+    print(f"🤖 LLM Type: {args.llm_type}")
+    if args.llm_type == 'ollama':
+        print(f"🦙 Ollama Model: {args.ollama_model}")
+        print(f"🔗 Ollama URL: {args.ollama_url}")
     print("=" * 60)
     
     # End any existing MLflow run
@@ -230,34 +325,73 @@ def main():
         enable_autolog=True  # Use autolog for any sklearn components
     )
     
+    # Enable MLflow LangChain autologging if using Ollama
+    if args.llm_type == 'ollama':
+        mlflow.langchain.autolog(silent=True)
+        print("✅ MLflow LangChain autologging enabled for Ollama")
+    
     # 2. Initialize Spark using our utility
     print("🚀 Initializing Spark session...")
     spark = create_mlflow_spark_session(
-        app_name="MLflow-Spark-LangChain-Simple"
+        app_name="MLflow-Spark-LangChain-Multiple-Mode"
     )
     
     try:
-        with mlflow.start_run(run_name="simple_langchain_sentiment"):
+        with mlflow.start_run(run_name="multiple_mode_langchain_sentiment"):
             
             # 3. Create sample data using Spark
             df = create_sample_text_data(spark, args.num_samples)
             
             # Log basic parameters
             mlflow.log_param("num_samples", args.num_samples)
-            mlflow.log_param("use_openai", args.use_openai)
+            mlflow.log_param("llm_type", args.llm_type)
             mlflow.log_param("langchain_available", LANGCHAIN_AVAILABLE)
+            if args.llm_type == 'ollama':
+                mlflow.log_param("ollama_model", args.ollama_model)
+                mlflow.log_param("ollama_url", args.ollama_url)
+                mlflow.log_param("langchain_autolog_enabled", True)
+            elif args.llm_type == 'openai':
+                mlflow.log_param("use_openai", True)
+                mlflow.log_param("langchain_autolog_enabled", False)
+            else:  # mock
+                mlflow.log_param("langchain_autolog_enabled", False)
             
             # Show sample data
             print("\n📝 Sample Data:")
             df.show(5, truncate=False)
             
-            # 4. Setup LangChain LLM
+            # 4. Setup LangChain LLM configuration
             import os
-            api_key = os.getenv('OPENAI_API_KEY') if args.use_openai else None
-            llm = setup_langchain_llm(args.use_openai, api_key)
+            api_key = os.getenv('OPENAI_API_KEY') if args.llm_type == 'openai' else None
+            
+            # Test LLM connection (for logging purposes)
+            llm = setup_langchain_llm(
+                llm_type=args.llm_type,
+                model_name=args.ollama_model,
+                api_key=api_key,
+                ollama_base_url=args.ollama_url
+            )
+            
+            # Create configuration for UDFs (serializable)
+            llm_config = None
+            if args.llm_type == 'ollama':
+                llm_config = {
+                    'type': 'ollama',
+                    'model': args.ollama_model,
+                    'base_url': args.ollama_url
+                }
+            elif args.llm_type == 'openai':
+                llm_config = {
+                    'type': 'openai',
+                    'api_key': api_key
+                }
+            elif args.llm_type == 'mock':
+                llm_config = {
+                    'type': 'mock'
+                }
             
             # 5. Process texts with Spark UDFs + LangChain (distributed processing)
-            results_df = process_texts_with_spark_and_langchain(spark, df, llm)
+            results_df = process_texts_with_spark_and_langchain(spark, df, llm_config)
             
             # 6. Calculate and log metrics
             metrics = calculate_accuracy(results_df)
