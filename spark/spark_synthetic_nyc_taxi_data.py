@@ -25,11 +25,8 @@ import mlflow
 import mlflow.sklearn
 import mlflow.spark
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, rand, when, lit
+from pyspark.sql.functions import col, when, rand
 from pyspark.sql.types import StructType, StructField, DoubleType, IntegerType
-from pyspark.ml.feature import VectorAssembler
-from pyspark.ml.regression import RandomForestRegressor
-from pyspark.ml.evaluation import RegressionEvaluator
 
 # Import utility functions
 from loader import load_mlflow_setup

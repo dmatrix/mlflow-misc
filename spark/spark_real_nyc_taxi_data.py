@@ -29,12 +29,8 @@ import mlflow
 import mlflow.sklearn
 import mlflow.spark
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, when, isnan, isnull, year, month, dayofmonth, hour, dayofweek
-from pyspark.sql.functions import unix_timestamp, from_unixtime, abs as spark_abs, sqrt, pow as spark_pow
+from pyspark.sql.functions import col, when, isnan, month, dayofmonth, hour, dayofweek, unix_timestamp
 from pyspark.sql.types import DoubleType, IntegerType
-from pyspark.ml.feature import VectorAssembler
-from pyspark.ml.regression import RandomForestRegressor
-from pyspark.ml.evaluation import RegressionEvaluator
 
 # Import utility functions
 from loader import load_mlflow_setup

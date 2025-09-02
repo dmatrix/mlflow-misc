@@ -10,7 +10,7 @@ import mlflow.spark
 from pyspark.ml.feature import VectorAssembler
 from pyspark.ml.regression import RandomForestRegressor
 from pyspark.ml.evaluation import RegressionEvaluator
-from typing import Optional
+
 
 
 def prepare_features(df, feature_cols: list = None, target_col: str = "tip_amount", return_feature_cols: bool = False):
