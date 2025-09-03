@@ -244,7 +244,7 @@ def process_texts_with_spark_and_langchain(spark, df, llm_config):
             return analyze_sentiment_with_langchain(text, None)
     
     # Register the UDF with Spark (optimized for string processing)
-    sentiment_udf = udf(sentiment_analysis_udf, StringType())
+    sentiment_udf = spark.udf.register("sentiment_analysis_udf", sentiment_analysis_udf, StringType())
     
     print("🌐 Applying UDF across Spark cluster for distributed processing...")
     
