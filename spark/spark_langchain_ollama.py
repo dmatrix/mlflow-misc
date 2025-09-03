@@ -259,7 +259,7 @@ def process_texts_with_spark_and_ollama(spark, df, model_name: str, base_url: st
             return analyze_sentiment_with_ollama(text, None)
     
     # Register the UDF with Spark
-    sentiment_udf = udf(sentiment_analysis_udf, StringType())
+    sentiment_udf = spark.udf.register("sentiment_analysis_udf", sentiment_analysis_udf, StringType())
     
     print("🌐 Applying UDF across Spark cluster for distributed processing...")
     print("🦙 Each executor will create its own Ollama connection")
