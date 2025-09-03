@@ -324,10 +324,10 @@ def main():
         enable_autolog=True
     )
     
-    # Enable MLflow LangChain autologging if using Ollama
-    if args.llm_type == 'ollama':
+    # Enable MLflow LangChain autologging for real LLMs (not mock)
+    if args.llm_type in ['ollama', 'openai']:
         mlflow.langchain.autolog(silent=True)
-        print("✅ MLflow LangChain autologging enabled for Ollama")
+        print(f"✅ MLflow LangChain autologging enabled for {args.llm_type}")
     
     # 2. Initialize Spark using our utility
     print("🚀 Initializing Spark session...")
