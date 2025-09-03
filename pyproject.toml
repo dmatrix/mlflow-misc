@@ -64,8 +64,7 @@ Issues = "https://github.com/jules/mlflow-misc/issues"
 [project.scripts]
 mlflow-tracking-example = "tracking.simple_tracking_basic:main"
 mlflow-spark-synthetic = "spark.spark_synthetic_nyc_taxi_data:main"
-mlflow-spark-nyc-taxi = "spark.spark_real_nyc_taxi_data:main"
-mlflow-spark-langchain-multiple = "spark.spark_langchain_multiple_mode:main"
+mlflow-spark-nyc-taxi = "spark.spark_real_nyc_taxi_datamlflow-spark-langchain-multiple = "spark.spark_langchain_multiple_mode:main"
 mlflow-spark-langchain-ollama = "spark.spark_langchain_ollama:main"
 
 [build-system]
