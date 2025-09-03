@@ -31,10 +31,9 @@ import random
 sys.path.append(str(Path(__file__).parent.parent / "utils"))
 
 import mlflow
-import mlflow.sklearn
 import mlflow.langchain
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, lit, udf
+from pyspark.sql.functions import col, udf
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType
 
 # LangChain imports with fallback
@@ -322,7 +321,7 @@ def main():
     experiment_id = mlflow_setup.setup_mlflow_tracking(
         tracking_uri="file:./mlruns",
         experiment_name=args.experiment_name,
-        enable_autolog=True  # Use autolog for any sklearn components
+        enable_autolog=True
     )
     
     # Enable MLflow LangChain autologging if using Ollama
