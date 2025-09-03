@@ -37,7 +37,7 @@ sys.path.append(str(Path(__file__).parent.parent / "utils"))
 import mlflow
 import mlflow.langchain
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, lit, udf
+from pyspark.sql.functions import col, udf
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType
 
 # LangChain imports for Ollama
@@ -172,7 +172,11 @@ def setup_ollama_llm(model_name: str = "llama3.2", base_url: str = "http://local
 
 
 def analyze_sentiment_with_ollama(text: str, llm) -> str:
-    """Analyze sentiment using Ollama via ChatOpenAI client."""
+    """Analyze sentiment using Ollama via ChatOpenAI client.
+    
+    Uses a recursive fallback pattern: if Ollama fails or returns unclear results,
+    falls back to rule-based keyword matching by calling itself with llm=None.
+    """
     
     if not llm:
         # Fallback rule-based analysis
