@@ -364,7 +364,7 @@ def get_document_info() -> Dict[str, Dict[str, str]]:
     return doc_info
 
 
-def demo_sample_documents():
+def demo_sample_documents() -> None:
     """Demonstrate the sample document generator."""
     
     print("📚 Sample Document Generator Demo")

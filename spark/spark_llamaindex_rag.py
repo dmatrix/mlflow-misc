@@ -30,13 +30,13 @@ import argparse
 import sys
 import os
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional, Tuple, Union
 
 # Add utils to path for imports
 sys.path.append(str(Path(__file__).parent.parent / "utils"))
 
 import mlflow
-from pyspark.sql import SparkSession
+from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.functions import col, udf, input_file_name
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType, ArrayType
 
@@ -57,7 +57,7 @@ from spark_utils import create_mlflow_spark_session
 from sample_documents import create_sample_documents
 
 
-def load_documents_with_spark(spark: SparkSession, docs_path: str):
+def load_documents_with_spark(spark: SparkSession, docs_path: str) -> DataFrame:
     """Load TXT and MD documents using Spark for distributed processing."""
     
     print(f"📚 Loading documents from {docs_path}...")
@@ -84,7 +84,7 @@ def load_documents_with_spark(spark: SparkSession, docs_path: str):
     # Add filename and file type columns
     df = df.withColumn("filename", input_file_name())
     
-    def extract_file_info(filepath: str) -> tuple:
+    def extract_file_info(filepath: str) -> Tuple[str, str]:
         """Extract filename and file type from full path."""
         path = Path(filepath)
         return path.name, path.suffix.lower()
@@ -110,7 +110,7 @@ def load_documents_with_spark(spark: SparkSession, docs_path: str):
     return df
 
 
-def chunk_documents_with_spark(spark: SparkSession, docs_df, chunk_size: int = 512, chunk_overlap: int = 50):
+def chunk_documents_with_spark(spark: SparkSession, docs_df: DataFrame, chunk_size: int = 512, chunk_overlap: int = 50) -> DataFrame:
     """Chunk documents using Spark UDFs for distributed processing."""
     
     print(f"✂️  Chunking documents (size: {chunk_size}, overlap: {chunk_overlap})...")
@@ -205,7 +205,7 @@ def chunk_documents_with_spark(spark: SparkSession, docs_df, chunk_size: int = 5
 
 
 def setup_llamaindex_llm(llm_type: str = "mock", model_name: str = "llama3.2", 
-                        api_key: str = None, ollama_base_url: str = "http://localhost:11434"):
+                        api_key: Optional[str] = None, ollama_base_url: str = "http://localhost:11434") -> Optional[Any]:
     """Setup LlamaIndex LLM with support for Mock, Ollama, or OpenAI."""
     
     if not LLAMAINDEX_AVAILABLE:
@@ -252,7 +252,7 @@ def setup_llamaindex_llm(llm_type: str = "mock", model_name: str = "llama3.2",
 class MockQueryEngine:
     """Mock query engine for demonstration when LlamaIndex is not available."""
     
-    def __init__(self, chunks_data: List[Dict]):
+    def __init__(self, chunks_data: List[Dict[str, Any]]) -> None:
         self.chunks_data = chunks_data
         
     def query(self, question: str) -> str:
@@ -274,7 +274,7 @@ class MockQueryEngine:
             return f"Based on the available documents, I found information related to your question about '{question}'. The documents contain details about machine learning, Python programming, Spark, MLflow, and data science workflows."
 
 
-def create_llamaindex_rag(chunks_df, llm, embed_model_name: str = "BAAI/bge-small-en-v1.5"):
+def create_llamaindex_rag(chunks_df: DataFrame, llm: Optional[Any], embed_model_name: str = "BAAI/bge-small-en-v1.5") -> Any:
     """Create LlamaIndex RAG system from Spark DataFrame chunks."""
     
     print("🔍 Creating LlamaIndex RAG system...")
@@ -353,7 +353,7 @@ def generate_sample_questions() -> List[str]:
     ]
 
 
-def process_questions_with_rag(query_engine, questions: List[str]):
+def process_questions_with_rag(query_engine: Any, questions: List[str]) -> List[Dict[str, Any]]:
     """Process questions using the RAG system and return results."""
     
     print(f"❓ Processing {len(questions)} questions with RAG...")
@@ -426,7 +426,7 @@ def calculate_rag_metrics(results: List[Dict]) -> Dict[str, Any]:
     }
 
 
-def main():
+def main() -> None:
     """Main function demonstrating Spark + MLflow + LlamaIndex RAG integration."""
     
     parser = argparse.ArgumentParser(description='Spark + MLflow + LlamaIndex RAG Integration')
@@ -513,8 +513,7 @@ def main():
             mlflow.log_param("embed_model", args.embed_model)
             mlflow.log_param("llamaindex_available", LLAMAINDEX_AVAILABLE)
             
-            # Log autolog status for both frameworks
-            mlflow.log_param("sklearn_autolog_enabled", False)  # Disabled for RAG use case
+            # Log autolog status
             mlflow.log_param("llamaindex_autolog_enabled", autolog_enabled)
             
             if args.llm_type == 'ollama':
