@@ -18,6 +18,10 @@ Documents → Spark Processing → LlamaIndex RAG → MLflow Tracking
    Files      Metadata        & Embeddings      Traces
 ```
 
+### Control and functional flow
+<img src="images/spark_llamaindex_rag.png"/>
+
+
 ### Key Components
 
 1. **Document Processing Pipeline**
