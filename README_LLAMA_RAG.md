@@ -19,7 +19,7 @@ Documents → Spark Processing → LlamaIndex RAG → MLflow Tracking
 ```
 
 ### Control and functional flow
-<img src="images/spark_llamaindex_rag.png"/>
+<img src="spark/images/spark_llamaindex_rag.png"/>
 
 
 ### Key Components
