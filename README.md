@@ -46,11 +46,13 @@ mlflow-misc/
 │   ├── spark_real_nyc_taxi_data.py          # Real NYC taxi data with RandomForest
 │   ├── spark_langchain_multiple_mode.py     # Multi-LLM sentiment analysis (OpenAI/Ollama/Mock)
 │   ├── spark_langchain_ollama.py            # Streamlined Ollama + Spark + MLflow integration
+│   ├── spark_llamaindex_rag.py              # LlamaIndex RAG with distributed document processing
 │   ├── spark_ml_utils.py                    # Common ML functions (training, inference, features)
 │   └── README.md                            # Spark MLflow integration guide with Ollama setup
 ├── utils/                         # Reusable MLflow utility modules
 │   ├── mlflow_setup.py           # MLflow configuration & experiment setup
 │   ├── data_generation.py        # Synthetic dataset generation
+│   ├── sample_documents.py       # Document generator for RAG testing
 │   ├── visualization.py          # Plotting & visualization utilities
 │   ├── model_evaluation.py       # Model evaluation & metrics calculation
 │   ├── loader.py                 # Dynamic module loading with importlib.util
@@ -83,6 +85,7 @@ mlflow-misc/
 - **Large-scale synthetic data generation** (500K+ rows) and real-world data processing
 - **Scalable ML workflows** with Spark MLlib and proper memory management
 - **LangChain + Spark UDFs** distributed NLP processing with modern sentiment analysis
+- **LlamaIndex RAG** distributed document processing with vector indexing and retrieval-augmented generation
 - **🦙 Ollama Integration** - Local LLM processing with MLflow trace logging (tested with Llama3.2 and Mistral models)
 
 ### **Modular Utility System**
@@ -213,6 +216,7 @@ pipx install uv
 |-----------|-------------|------|
 | **Tracking Examples** | Complete MLflow tracking guide with autolog | [tracking/README.md](./tracking/README.md) |
 | **Spark Integration** | Distributed ML + LangChain NLP with Ollama models | [spark/README.md](./spark/README.md) |
+| **LlamaIndex RAG** | RAG system with Spark + LlamaIndex + MLflow integration | [README_LLAMA_RAG.md](./README_LLAMA_RAG.md) |
 | **🦙 Ollama Integration** | Local LLM setup and MLflow trace logging | [spark/README.md](./spark/README.md) |
 | **Utility Modules** | Reusable MLflow components and helpers | [utils/](./utils/) |
 | **Project Configuration** | UV setup, dependencies, and entry points | [pyproject.toml](./pyproject.toml) |
