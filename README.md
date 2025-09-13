@@ -1,6 +1,16 @@
 
 # 🚀 MLflow-Misc: Comprehensive MLflow Examples & Utilities
 
+[![Python](https://img.shields.io/badge/Python-3.9%2B-blue?logo=python&logoColor=white)](https://www.python.org/)
+[![MLflow](https://img.shields.io/badge/MLflow-3.3.2-orange?logo=mlflow&logoColor=white)](https://mlflow.org/)
+[![Apache Spark](https://img.shields.io/badge/Apache%20Spark-4.0.0-orange?logo=apache-spark&logoColor=white)](https://spark.apache.org/)
+[![PySpark](https://img.shields.io/badge/PySpark-ML-orange?logo=apache-spark&logoColor=white)](https://spark.apache.org/docs/latest/api/python/)
+[![UV](https://img.shields.io/badge/UV-Package%20Manager-purple?logo=python&logoColor=white)](https://github.com/astral-sh/uv)
+[![LangChain](https://img.shields.io/badge/LangChain-Integrated-green?logo=langchain&logoColor=white)](https://langchain.com/)
+[![LlamaIndex](https://img.shields.io/badge/LlamaIndex-RAG-blue?logo=llama&logoColor=white)](https://www.llamaindex.ai/)
+[![Ollama](https://img.shields.io/badge/Ollama-Local%20LLM-red?logo=llama&logoColor=white)](https://ollama.com/)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 ```
  ███╗   ███╗██╗     ███████╗██╗      ██████╗ ██╗    ██╗
  ████╗ ████║██║     ██╔════╝██║     ██╔═══██╗██║    ██║
