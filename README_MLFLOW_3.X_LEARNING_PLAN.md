@@ -2,6 +2,8 @@
 
 A comprehensive, modular learning plan for mastering MLflow 3.x with focus on GenAI applications and Agents. Each module builds upon previous knowledge.
 
+![MLflow GenAI Learning Journey](images/mlflow_genai_learning_plan.gif)
+
 ---
 
 ## 📚 Module 1: MLflow 3.x Fundamentals & What's New
