@@ -118,7 +118,7 @@ def create_module_frame(frame_num, total_frames=16):
     active_module = int(progress * len(modules))
 
     # Draw circular progress path
-    center_x, center_y = width // 2, height // 2
+    center_x, center_y = width // 2, height // 2 + 60
     radius = 280
 
     # Draw connection lines first (background)
@@ -202,7 +202,7 @@ def create_module_frame(frame_num, total_frames=16):
     title = "MLflow 3.x GenAI & Agents"
     title_bbox = draw.textbbox((0, 0), title, font=title_font)
     title_width = title_bbox[2] - title_bbox[0]
-    draw.text((width // 2 - title_width // 2, 50), title,
+    draw.text((width // 2 - title_width // 2, 30), title,
              fill=(0, 255, 255), font=title_font)
 
     # Draw subtitle in a hexagonal badge
@@ -257,13 +257,51 @@ def create_module_frame(frame_num, total_frames=16):
     draw.text((text_x, text_y), subtitle,
              fill=(255, 128, 255), font=subtitle_font)
 
-    # Draw current module name
-    if active_module < len(modules):
-        current_module = modules[active_module]
-        module_bbox = draw.textbbox((0, 0), current_module, font=module_font)
-        module_width = module_bbox[2] - module_bbox[0]
-        draw.text((width // 2 - module_width // 2, height - 100), current_module,
-                 fill=module_colors[active_module], font=module_font)
+    # Draw module labels next to their corresponding nodes
+    for i, module in enumerate(modules):
+        # Only show text for active modules
+        if i <= active_module:
+            angle = (i / len(modules)) * 2 * np.pi - np.pi / 2
+
+            # Calculate node position
+            node_x = center_x + int(radius * np.cos(angle))
+            node_y = center_y + int(radius * np.sin(angle))
+
+            # Calculate text offset distance (60px beyond the node)
+            text_offset = 60
+            text_anchor_x = center_x + int((radius + text_offset) * np.cos(angle))
+            text_anchor_y = center_y + int((radius + text_offset) * np.sin(angle))
+
+            # Get text dimensions
+            text_bbox = draw.textbbox((0, 0), module, font=module_font)
+            text_width = text_bbox[2] - text_bbox[0]
+            text_height = text_bbox[3] - text_bbox[1]
+
+            # Adjust text position based on angle to avoid overlap
+            # Normalize angle to [0, 2π]
+            normalized_angle = angle % (2 * np.pi)
+
+            # Position text based on quadrant
+            if normalized_angle < np.pi / 4 or normalized_angle > 7 * np.pi / 4:
+                # Right side - text to the right
+                final_x = text_anchor_x
+                final_y = text_anchor_y - text_height // 2
+            elif normalized_angle < 3 * np.pi / 4:
+                # Bottom - text below
+                final_x = text_anchor_x - text_width // 2
+                final_y = text_anchor_y
+            elif normalized_angle < 5 * np.pi / 4:
+                # Left side - text to the left
+                final_x = text_anchor_x - text_width
+                final_y = text_anchor_y - text_height // 2
+            else:
+                # Top - text above
+                final_x = text_anchor_x - text_width // 2
+                final_y = text_anchor_y - text_height
+
+            # Draw text with appropriate color
+            draw.text((final_x, final_y), module,
+                     fill=module_colors[i], font=module_font)
 
     # Add "floating" data particles for futuristic effect
     np.random.seed(frame_num)  # Consistent randomness per frame
@@ -285,7 +323,7 @@ def create_module_frame(frame_num, total_frames=16):
 
 
 def create_animated_gif(output_path='images/mlflow_genai_learning_plan.gif',
-                       num_frames=16, duration=200, loop=0):
+                       num_frames=24, duration=300, loop=0):
     """
     Create the complete animated GIF.
 
@@ -335,10 +373,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Generate MLflow GenAI Learning Plan GIF')
     parser.add_argument('--output', default='images/mlflow_genai_learning_plan.gif',
                        help='Output path for GIF')
-    parser.add_argument('--frames', type=int, default=16,
-                       help='Number of frames (default: 16)')
-    parser.add_argument('--duration', type=int, default=200,
-                       help='Duration per frame in ms (default: 200)')
+    parser.add_argument('--frames', type=int, default=24,
+                       help='Number of frames (default: 24)')
+    parser.add_argument('--duration', type=int, default=300,
+                       help='Duration per frame in ms (default: 300)')
 
     args = parser.parse_args()
 
