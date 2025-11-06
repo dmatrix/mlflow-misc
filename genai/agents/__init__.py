@@ -1,7 +1,6 @@
 """MLflow GenAI Agents."""
 
 from genai.agents.fact_checker_agent import FactCheckerAgent
-from genai.agents.insect_expert_agent import InsectExpertAgent
-from genai.agents.insect_expert_ollama import InsectExpertOllamaAgent
+from genai.agents.insect_expert_openai import InsectExpertOpenAIAgent
 
-__all__ = ["FactCheckerAgent", "InsectExpertAgent", "InsectExpertOllamaAgent"]
+__all__ = ["FactCheckerAgent", "InsectExpertOpenAIAgent"]

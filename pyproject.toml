@@ -39,6 +39,7 @@ dependencies = [
     "openai>=1.0.0",
     "streamlit>=1.39.0",
     "ollama>=0.6.0",
+    "databricks-sdk>=0.20.0",
 ]
 
 [project.optional-dependencies]
@@ -87,8 +88,6 @@ mlflow-spark-langchain-ollama = "spark.spark_langchain_ollama:main"
 mlflow-spark-llamaindex-rag = "spark.spark_llamaindex_rag:main"
 mlflow-sample-documents = "utils.sample_documents:demo_sample_documents"
 mlflow-fact-checker = "genai.agents.fact_checker_agent:main"
-mlflow-insect-expert = "genai.agents.insect_expert_agent:main"
-mlflow-insect-expert-ollama = "genai.agents.insect_expert_ollama:main"
 mlflow-insect-expert-streamlit = "genai.agents.insect_expert_streamlit:main"
 
 [build-system]

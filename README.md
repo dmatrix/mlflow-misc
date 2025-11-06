@@ -68,7 +68,10 @@ mlflow-misc/
 │   ├── loader.py                 # Dynamic module loading with importlib.util
 │   └── __init__.py               # Utility imports & convenience functions
 ├── models/                        # Model-related utilities (future expansion)
-├── genai/                         # GenAI/LLM utilities (future expansion)
+├── genai/                         # GenAI/LLM utilities and agent examples
+│   └── agents/
+│       ├── insect_expert_openai.py      # OpenAI/Databricks Foundation Model Serving endpoints agent class
+│       └── insect_expert_streamlit.py   # Interactive Streamlit chat UI
 ├── pyproject.toml                 # UV project configuration with entry points
 └── README.md                      # This file - project overview
 ```
@@ -96,7 +99,13 @@ mlflow-misc/
 - **Scalable ML workflows** with Spark MLlib and proper memory management
 - **LangChain + Spark UDFs** distributed NLP processing with modern sentiment analysis
 - **LlamaIndex RAG** distributed document processing with vector indexing and retrieval-augmented generation
-- **🦙 Ollama Integration** - Local LLM processing with MLflow trace logging (tested with Llama3.2 and Mistral models)
+
+### **GenAI Agent Examples**
+- **🦋 Insect Expert Streamlit App** - Interactive chat interface with Databricks Foundation Model Serving endpoints/OpenAI
+- **Multiple LLM Support** - GPT-5, Gemini 2.5 Flash, Claude Sonnet 4.5 via Databricks
+- **MLflow 3.x Tracing** - Full agent observability with `@mlflow.trace` decorators
+- **Secure Configuration** - Environment variable-based credential management
+- **Beautiful UI** - Production-ready Streamlit chat interface
 
 ### **Modular Utility System**
 - **Dynamic module loading** using `importlib.util`
@@ -171,15 +180,13 @@ uv sync --extra spark
 uv run mlflow-spark-synthetic    # Synthetic NYC taxi data
 uv run mlflow-spark-nyc-taxi     # Real NYC taxi data
 
-# Run Ollama + Spark + MLflow integration (Simplified - RECOMMENDED)
-uv sync --extra spark --extra langchain
+# Run GenAI Agent examples
+# Set up Databricks Foundation Model Serving endpoints credentials first:
+export DATABRICKS_TOKEN='your-token'
+export DATABRICKS_HOST='https://your-workspace.cloud.databricks.com'
 
-# Simplified Ollama-only integration (no API keys needed, with MLflow trace logging)
-# First install and setup Ollama: brew install ollama && ollama serve && ollama pull llama3.2
-uv run mlflow-spark-langchain-ollama --ollama-model llama3.2 --num-samples 1000
-
-# Legacy: Multi-LLM script (more complex, conditional autologging for Ollama)
-uv run mlflow-spark-langchain-multiple --llm-type ollama --ollama-model llama3.2 --num-samples 100
+# Launch Insect Expert Streamlit App
+uv run mlflow-insect-expert-streamlit
 
 # View results in MLflow UI
 mlflow ui
@@ -227,7 +234,7 @@ pipx install uv
 | **Tracking Examples** | Complete MLflow tracking guide with autolog | [tracking/README.md](./tracking/README.md) |
 | **Spark Integration** | Distributed ML + LangChain NLP with Ollama models | [spark/README.md](./spark/README.md) |
 | **LlamaIndex RAG** | RAG system with Spark + LlamaIndex + MLflow integration | [README_LLAMA_RAG.md](./README_LLAMA_RAG.md) |
-| **🦙 Ollama Integration** | Local LLM setup and MLflow trace logging | [spark/README.md](./spark/README.md) |
+| **🦋 GenAI Agents** | Interactive Streamlit chat app with Databricks Foundation Model Serving endpoints/OpenAI | [genai/agents/README.md](./genai/agents/README.md) |
 | **Utility Modules** | Reusable MLflow components and helpers | [utils/](./utils/) |
 | **Project Configuration** | UV setup, dependencies, and entry points | [pyproject.toml](./pyproject.toml) |
 
