@@ -1,155 +1,144 @@
-# MLflow 3.x Insect Expert Agent
+# 🦋 Insect Expert Chat - Streamlit App
 
-A simple Q&A agent that answers questions about insects using Ollama (local LLM) with MLflow tracing. No API key required - runs completely free!
+An interactive AI agent that answers questions about insects using **Databricks Foundation Model Serving endpoints** or **OpenAI** models with **MLflow 3.x tracing**.
 
 ## 🚀 Quick Start
 
-### Prerequisites
+### 1. Set Environment Variables
+
+**For Databricks Foundation Model Serving endpoints (Default):**
+```bash
+export DATABRICKS_TOKEN='your-databricks-token'
+export DATABRICKS_HOST='https://your-workspace.cloud.databricks.com'
+```
+
+**Note:** Requires access to Databricks Foundation Model Serving endpoints.
+
+**For OpenAI (Alternative):**
+```bash
+export OPENAI_API_KEY='your-openai-api-key'
+```
+
+### 2. Install Dependencies
 
 ```bash
-# 1. Install dependencies
 uv sync
-
-# 2. Start Ollama (in one terminal)
-ollama serve
 ```
 
-### Option 1: Command Line (Recommended for learning)
+### 3. Launch the App
 
 ```bash
-# Run with default question
-uv run mlflow-insect-expert-ollama
-
-# Ask your own question
-uv run mlflow-insect-expert-ollama --question "How do bees navigate?"
-
-# Try different models
-uv run mlflow-insect-expert-ollama --model llama3.1
-
-# Adjust temperature (0.0 = focused, 1.0 = creative)
-uv run mlflow-insect-expert-ollama --temperature 0.9
+streamlit run insect_expert_streamlit.py
 ```
 
-**First run downloads the model (~2GB). Subsequent runs are instant!**
+The app will open at http://localhost:8501
 
-### Option 2: Streamlit Web UI (Recommended for experimentation)
-
-```bash
-# Launch the web app
-streamlit run genai/agents/insect_expert_streamlit.py
-
-# Opens automatically at http://localhost:8501
-```
-
-**Features:**
-- 💬 Full conversation history
-- 🎛️ Interactive controls for model and temperature
-- 📊 Toggle MLflow tracking on/off
-- 🎨 Beautiful chat interface
-
-### View Traces in MLflow
+### 4. View MLflow Traces (Optional)
 
 ```bash
+# In a separate terminal
 mlflow ui
 # Open http://localhost:5000 → Traces tab
 ```
 
 ---
 
-## 📖 Example Questions
+## 🤖 Available Models
 
-```bash
-# Basics
-uv run mlflow-insect-expert-ollama --question "What's the difference between insects and spiders?"
-uv run mlflow-insect-expert-ollama --question "How many legs do insects have?"
+### Databricks Foundation Model Serving endpoints
+- **GPT-5** - Latest OpenAI model via Databricks
+- **Gemini 2.5 Flash** - Google's fast model via Databricks
+- **Claude Sonnet 4.5** - Anthropic's Claude via Databricks
 
-# Behavior
-uv run mlflow-insect-expert-ollama --question "How do ants communicate?"
-uv run mlflow-insect-expert-ollama --question "Why are moths attracted to light?"
-
-# Biology
-uv run mlflow-insect-expert-ollama --question "Explain butterfly metamorphosis"
-uv run mlflow-insect-expert-ollama --question "How do fireflies produce light?"
-```
+### OpenAI Models
+- **GPT-4**
+- **GPT-4 Turbo**
+- **GPT-3.5 Turbo**
 
 ---
 
-## 🔧 Setup Details
+## 💬 Example Questions
 
-### Installing Ollama
-
-If Ollama is not installed:
-
-```bash
-# macOS/Linux
-curl -fsSL https://ollama.com/install.sh | sh
-
-# Or download from: https://ollama.com/download
-```
-
-### Available Models
-
-The agent works with any Ollama model. Popular choices:
-- `llama3.2` (default, ~2GB)
-- `llama3.1` (larger, better quality)
-- `mistral`
-- `phi3`
-
-Models download automatically on first use.
+Try asking:
+- What's the difference between butterflies and moths?
+- How do fireflies produce light?
+- Why are bee populations declining?
+- How do ants communicate?
 
 ---
 
-## 📂 Files
+## 🔧 Features
 
-```
-genai/agents/
-├── insect_expert_ollama.py      # CLI version
-└── insect_expert_streamlit.py   # Web UI version
-```
+- **Multiple Models**: Switch between GPT-5, Gemini, and Claude via Databricks Foundation Model Serving endpoints
+- **Provider Selection**: Toggle between Databricks Foundation Model Serving endpoints and OpenAI
+- **Temperature Control**: Adjust response creativity (0.0-1.0)
+- **Chat History**: Persistent conversation tracking
+- **MLflow Tracing**: Full observability with @mlflow.trace
+- **Secure Config**: Environment variable-based credentials
 
 ---
 
 ## 🔍 Troubleshooting
 
-**"ollama server not responding"**
+**"Failed to initialize agent"**
+
+For Databricks:
 ```bash
-ollama serve
+# Check environment variables
+echo $DATABRICKS_TOKEN
+echo $DATABRICKS_HOST
+
+# Verify format
+# Token: dapi... or similar
+# Host: https://your-workspace.cloud.databricks.com
 ```
 
-**"model not found"**
+For OpenAI:
 ```bash
-ollama pull llama3.2
+# Check API key
+echo $OPENAI_API_KEY
 ```
 
-**Check available models**
-```bash
-ollama list
-```
-
-**No traces in MLflow UI**
-- Make sure you ran the agent AFTER starting `mlflow ui`
-- Don't use `--no-mlflow` flag
+**Common Issues:**
+- Missing environment variables
+- Invalid token/API key
+- No access to Databricks Foundation Model Serving endpoints
+- Incorrect workspace URL
 
 ---
 
-## 💡 Tips
+## 🔐 Security
 
-1. **Start with CLI** - Understand the basics first
-2. **Then try Streamlit** - Better for experimentation and demos
-3. **Check MLflow UI** - See how tracing captures agent behavior
-4. **Try different models** - Compare quality vs speed
-5. **Adjust temperature** - Lower for facts, higher for creativity
-
----
-
-## 🎓 What You'll Learn
-
-- How to build an agent with MLflow 3.x
-- Using `@mlflow.trace` decorators for tracing
-- Integrating local LLMs with Ollama
-- MLflow experiment tracking and traces
-- Building interactive UIs with Streamlit
+**Best Practices:**
+- ✅ Use environment variables for credentials
+- ✅ Never commit tokens to version control
+- ✅ Rotate tokens regularly
+- ❌ Don't hardcode credentials in code
+- ❌ Don't share tokens in screenshots
 
 ---
 
-Made with ❤️ using MLflow 3.x + Ollama
+## 📦 Dependencies
+
+```toml
+mlflow>=3.3.2           # Experiment tracking
+streamlit>=1.39.0       # Web interface
+openai>=1.0.0           # OpenAI client
+databricks-sdk>=0.20.0  # Databricks integration
+```
+
+---
+
+## 📖 Documentation
+
+**Databricks Resources:**
+- [Personal Access Token Guide](https://docs.databricks.com/en/dev-tools/auth/pat.html)
+- [Foundation Model APIs Documentation](https://docs.databricks.com/en/machine-learning/foundation-models/index.html)
+
+**Architecture:**
+- `insect_expert_openai.py` - Agent class with MLflow tracing
+- `insect_expert_streamlit.py` - Streamlit UI with chat interface
+
+---
+
+Made with ❤️ using **MLflow 3.x** + **Databricks Foundation Model Serving endpoints** + **Streamlit**

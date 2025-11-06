@@ -1,20 +1,17 @@
 """
-Streamlit Chat App for Insect Expert Agent using Ollama and MLflow.
+Streamlit Chat App for Insect Expert Agent using OpenAI/Databricks Foundation Model Serving endpoints and MLflow.
 
 This provides an interactive web interface for the insect expert agent.
 Run with: streamlit run genai/agents/insect_expert_streamlit.py
 Or: uv run mlflow-insect-expert-streamlit
 """
 
+import os
 import streamlit as st
 import mlflow
-from ollama import Client
 
-from genai.agents.insect_expert_ollama import (
-    InsectExpertOllamaAgent,
-    check_ollama_installed,
-    check_model_available,
-    pull_model,
+from genai.agents.insect_expert_openai import (
+    InsectExpertOpenAIAgent,
     setup_mlflow_tracking,
 )
 
@@ -27,7 +24,7 @@ from genai.agents.insect_expert_ollama import (
 def configure_page():
     """Configure Streamlit page settings."""
     st.set_page_config(
-        page_title="Insect Expert Chat",
+        page_title="Insect Expert Assistant",
         page_icon="🦋",
         layout="centered",
         initial_sidebar_state="expanded",
@@ -44,62 +41,107 @@ def render_sidebar():
     with st.sidebar:
         st.title("⚙️ Settings")
 
-        # Ollama connection status
-        st.subheader("🔌 Ollama Status")
-        if check_ollama_installed():
-            st.success("Ollama is installed ✓")
-        else:
-            st.error("Ollama not installed ✗")
-            st.markdown(
-                """
-                **Installation required:**
-                ```bash
-                # macOS/Linux
-                curl -fsSL https://ollama.com/install.sh | sh
+        # API Configuration
+        st.subheader("🔌 API Configuration")
 
-                # Or visit: https://ollama.com/download
-                ```
-                """
+        # Provider selection
+        provider = st.radio(
+            "Provider",
+            ["Databricks", "OpenAI"],
+            index=0,
+            help="Choose the API provider",
+        )
+
+        # API Key input
+        api_key_env = "DATABRICKS_TOKEN" if provider == "Databricks" else "OPENAI_API_KEY"
+        api_key_from_env = os.environ.get(api_key_env, "")
+
+        if api_key_from_env:
+            st.success(f"{api_key_env} found in environment ✓")
+            api_key = api_key_from_env
+        else:
+            api_key = st.text_input(
+                f"{api_key_env}",
+                type="password",
+                help=f"Enter your {provider} API key",
             )
-            st.stop()
+            if not api_key:
+                st.error(f"Please provide {api_key_env}")
+                st.info(
+                    f"""
+                    **Set environment variable:**
+                    ```bash
+                    export {api_key_env}='your-key'
+                    ```
+                    """
+                )
+                st.stop()
+
+        # Databricks Host input (only for Databricks provider)
+        databricks_host = None
+        if provider == "Databricks":
+            databricks_host_from_env = os.environ.get("DATABRICKS_HOST", "")
+
+            if databricks_host_from_env:
+                st.success("DATABRICKS_HOST found in environment ✓")
+                databricks_host = databricks_host_from_env
+            else:
+                databricks_host = st.text_input(
+                    "DATABRICKS_HOST",
+                    type="password",
+                    help="Enter your Databricks workspace host URL",
+                    placeholder="https://your-workspace.cloud.databricks.com"
+                )
+                if not databricks_host:
+                    st.error("Please provide DATABRICKS_HOST")
+                    st.info(
+                        """
+                        **Set environment variable:**
+                        ```bash
+                        export DATABRICKS_HOST='https://your-workspace.cloud.databricks.com'
+                        ```
+                        """
+                    )
+                    st.stop()
 
         st.divider()
 
         # Model selection
         st.subheader("🤖 Model Settings")
-        available_models = [
-            "llama3.2",
-            "llama3.1",
-            "llama3.2:1b",
-            "llama3.1:8b",
-            "mistral",
-            "phi3",
-        ]
 
-        model = st.selectbox(
+        if provider == "Databricks":
+            # Model options with display names
+            model_options = {
+                "GPT-5": "databricks-gpt-5",
+                "Gemini 2.5 Flash": "databricks-gemini-2-5-flash",
+                "Claude Sonnet 4.5": "databricks-claude-sonnet-4-5",
+            }
+            use_databricks = True
+        else:
+            # OpenAI models
+            model_options = {
+                "GPT-4": "gpt-4",
+                "GPT-4 Turbo": "gpt-4-turbo",
+                "GPT-3.5 Turbo": "gpt-3.5-turbo",
+            }
+            use_databricks = False
+
+        # Display model selection with friendly names
+        model_display = st.selectbox(
             "Select Model",
-            available_models,
+            list(model_options.keys()),
             index=0,
-            help="Choose the Ollama model to use",
+            help=f"Choose the {provider} model to use",
         )
 
-        # Check if model is available
-        if not check_model_available(model):
-            st.warning(f"Model '{model}' not found locally")
-            if st.button(f"Download {model}"):
-                with st.spinner(f"Downloading {model}... This may take a few minutes."):
-                    try:
-                        pull_model(model)
-                        st.success(f"Model {model} downloaded successfully!")
-                        st.rerun()
-                    except Exception as e:
-                        st.error(f"Failed to download model: {e}")
+        # Get the actual model ID
+        model = model_options[model_display]
 
         temperature = st.slider(
             "Temperature",
             min_value=0.0,
             max_value=1.0,
-            value=0.7,
+            value=1.0,
             step=0.1,
             help="Higher = more creative, Lower = more focused",
         )
@@ -140,6 +182,10 @@ def render_sidebar():
             "temperature": temperature,
             "enable_mlflow": enable_mlflow,
             "experiment_name": experiment_name,
+            "api_key": api_key,
+            "use_databricks": use_databricks,
+            "databricks_host": databricks_host,
+            "provider": provider.lower(),
         }
 
 
@@ -155,13 +201,26 @@ def initialize_session_state(settings):
         st.session_state.messages = []
 
     # Initialize or update agent if settings changed
-    agent_key = f"{settings['model']}_{settings['temperature']}"
+    agent_key = f"{settings['model']}_{settings['temperature']}_{settings['provider']}"
 
     if "agent_key" not in st.session_state or st.session_state.agent_key != agent_key:
-        st.session_state.agent = InsectExpertOllamaAgent(
-            model=settings["model"], temperature=settings["temperature"]
-        )
-        st.session_state.agent_key = agent_key
+        try:
+            agent_kwargs = {
+                "model": settings["model"],
+                "temperature": settings["temperature"],
+                "api_key": settings["api_key"],
+                "use_databricks": settings["use_databricks"],
+            }
+
+            # Add databricks_host if using Databricks
+            if settings["use_databricks"] and settings.get("databricks_host"):
+                agent_kwargs["databricks_host"] = settings["databricks_host"]
+
+            st.session_state.agent = InsectExpertOpenAIAgent(**agent_kwargs)
+            st.session_state.agent_key = agent_key
+        except Exception as e:
+            st.error(f"Failed to initialize agent: {e}")
+            st.stop()
 
     # Setup MLflow experiment if enabled
     if settings["enable_mlflow"]:
@@ -204,7 +263,7 @@ def get_agent_response(question: str, settings: dict) -> str:
                     "model": agent.model,
                     "temperature": agent.temperature,
                     "question_length": len(question),
-                    "provider": "ollama",
+                    "provider": settings["provider"],
                     "interface": "streamlit",
                 }
             )
@@ -237,13 +296,22 @@ def main():
     configure_page()
 
     # Title and description
-    st.title("🦋 Insect Expert Chat")
+    st.title("🦋 Insect Expert Assistant")
     st.markdown(
         """
         Ask me anything about insects! I'm an enthusiastic entomologist ready to answer
         your questions about insect classification, behavior, anatomy, and more.
 
-        *Powered by Ollama (local LLM) + MLflow 3.x tracing*
+        *Powered by OpenAI/Databricks Foundation Model Serving endpoints + MLflow 3.x tracing*
+        """
+    )
+
+    # Requirements notice
+    st.info(
+        """
+        **Requirements:**
+        - **Databricks**: Requires `DATABRICKS_TOKEN` and `DATABRICKS_HOST` environment variables, plus access to Databricks Foundation Model Serving endpoints
+        - **OpenAI**: Requires `OPENAI_API_KEY` environment variable
         """
     )
 
@@ -282,16 +350,25 @@ def main():
                     st.error(error_msg)
 
                     # Show helpful troubleshooting
-                    st.markdown(
-                        """
-                        **Troubleshooting:**
-                        - Make sure Ollama is running: `ollama serve`
-                        - Check if model is available: `ollama list`
-                        - Try running the model: `ollama run {model}`
-                        """.format(
-                            model=settings["model"]
+                    if settings["provider"] == "databricks":
+                        st.markdown(
+                            """
+                            **Troubleshooting:**
+                            - Make sure you have a valid `DATABRICKS_TOKEN`
+                            - Verify you have set `DATABRICKS_HOST` correctly
+                            - Verify you have access to Databricks Foundation Model Serving endpoints
+                            - Check that the model name matches your endpoint configuration
+                            """
                         )
-                    )
+                    else:
+                        st.markdown(
+                            """
+                            **Troubleshooting:**
+                            - Check that your `OPENAI_API_KEY` is valid
+                            - Verify the model name is correct
+                            - Ensure you have API access to the selected model
+                            """
+                        )
 
     # Show example questions if chat is empty
     if len(st.session_state.messages) == 0:
