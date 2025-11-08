@@ -4,9 +4,13 @@ Streamlit Chat App for Insect Expert Agent using OpenAI/Databricks Foundation Mo
 This provides an interactive web interface for the insect expert agent.
 Run with: streamlit run genai/agents/insect_expert_streamlit.py
 Or: uv run mlflow-insect-expert-streamlit
+
+Command line options:
+  --debug    Enable debug output (prints evaluation details to console)
 """
 
 import os
+import sys
 import streamlit as st
 import mlflow
 
@@ -14,6 +18,9 @@ from genai.agents.insect_expert_openai import (
     InsectExpertOpenAIAgent,
     setup_mlflow_tracking,
 )
+
+# Check for --debug flag in command line arguments
+DEBUG_MODE = "--debug" in sys.argv
 
 
 # ============================================================================
@@ -163,11 +170,53 @@ def render_sidebar():
                 """
                 **View traces:**
                 ```bash
-                mlflow ui
+                mlflow ui --backend-store-uri sqlite:///mlflow.db --port 5000
                 ```
                 Then open: http://localhost:5000
                 """
             )
+
+        st.divider()
+
+        # Evaluation Settings
+        st.subheader("🔍 Real-Time Evaluation")
+
+        enable_evaluation = st.checkbox(
+            "Enable LLM-as-a-Judge",
+            value=True,
+            help="Evaluate each response quality using Databricks Foundation Model Serving endpoints (adds ~2-3s latency)",
+        )
+
+        if enable_evaluation:
+            # Judge model selection (Databricks models only)
+            judge_models = {
+                "Gemini 2.5 Flash (Recommended)": "databricks-gemini-2-5-flash",
+                "Claude Sonnet 4.5": "databricks-claude-sonnet-4-5",
+                "GPT-5": "databricks-gpt-5",
+            }
+
+            judge_display = st.selectbox(
+                "Judge Model",
+                list(judge_models.keys()),
+                index=0,
+                help="Databricks model used to evaluate responses",
+            )
+
+            judge_model = judge_models[judge_display]
+
+            st.info(
+                """
+                **Evaluation Metrics:**
+                - 🎯 Insect-specific relevance
+                - 🔬 Scientific accuracy
+                - ✨ Clarity and engagement
+                - 📏 Appropriate length (2-4 paragraphs)
+
+                **Note:** Uses same Databricks credentials
+                """
+            )
+        else:
+            judge_model = "databricks-gemini-2-5-flash"
 
         st.divider()
 
@@ -186,6 +235,8 @@ def render_sidebar():
             "use_databricks": use_databricks,
             "databricks_host": databricks_host,
             "provider": provider.lower(),
+            "enable_evaluation": enable_evaluation,
+            "judge_model": judge_model,
         }
 
 
@@ -201,7 +252,7 @@ def initialize_session_state(settings):
         st.session_state.messages = []
 
     # Initialize or update agent if settings changed
-    agent_key = f"{settings['model']}_{settings['temperature']}_{settings['provider']}"
+    agent_key = f"{settings['model']}_{settings['temperature']}_{settings['provider']}_{settings['enable_evaluation']}_{settings.get('judge_model', '')}"
 
     if "agent_key" not in st.session_state or st.session_state.agent_key != agent_key:
         try:
@@ -210,6 +261,9 @@ def initialize_session_state(settings):
                 "temperature": settings["temperature"],
                 "api_key": settings["api_key"],
                 "use_databricks": settings["use_databricks"],
+                "enable_evaluation": settings["enable_evaluation"],
+                "judge_model": settings["judge_model"],
+                "debug": DEBUG_MODE,  # Pass debug flag
             }
 
             # Add databricks_host if using Databricks
@@ -234,26 +288,120 @@ def initialize_session_state(settings):
 # ============================================================================
 
 
+def format_judge_analysis(rationale: str) -> str:
+    """
+    Format judge's analysis by making criterion labels bold.
+
+    Args:
+        rationale: Raw rationale text from judge
+
+    Returns:
+        Formatted rationale with bold labels
+    """
+    # List of criterion labels to make bold
+    criteria = [
+        "Insect-specific relevance:",
+        "Scientific accuracy and proper terminology:",
+        "Clarity and engagement:",
+        "Appropriate length:",
+    ]
+
+    # Replace each criterion label with bold version
+    formatted = rationale
+    for criterion in criteria:
+        formatted = formatted.replace(criterion, f"**{criterion}**")
+
+    return formatted
+
+
 def display_chat_history():
-    """Display all chat messages from history."""
-    for message in st.session_state.messages:
+    """Display all chat messages from history with evaluation scores."""
+    if DEBUG_MODE:
+        print(f"[DEBUG] display_chat_history called. Total messages: {len(st.session_state.messages)}")
+
+    for idx, message in enumerate(st.session_state.messages):
+        if DEBUG_MODE and message["role"] == "assistant":
+            print(f"[DEBUG] Message {idx}: role={message['role']}, has_eval_scores={'eval_scores' in message}")
+            if "eval_scores" in message:
+                print(f"[DEBUG] Message {idx} eval_scores keys: {list(message['eval_scores'].keys())}")
+
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
+            # Display evaluation scores if they exist for this message
+            if message["role"] == "assistant" and "eval_scores" in message:
+                scores = message["eval_scores"]
 
-def get_agent_response(question: str, settings: dict) -> str:
+                if scores and "rating" in scores:
+                    with st.expander("📊 Evaluation Results", expanded=False):
+                        # Display rating
+                        rating = scores["rating"].lower()
+                        rating_display = {
+                            "excellent": "🟢 Excellent",
+                            "good": "🟡 Good",
+                            "fair": "🟠 Fair",
+                            "poor": "🔴 Poor",
+                        }
+                        display_text = rating_display.get(rating, "⚪ Unknown")
+                        st.markdown(f"### {display_text}")
+
+                        # Show rationale
+                        if "rationale" in scores:
+                            st.markdown("**Judge's Analysis:**")
+                            formatted_rationale = format_judge_analysis(scores["rationale"])
+                            st.info(formatted_rationale)
+                elif DEBUG_MODE:
+                    print(f"[DEBUG] Message {idx}: eval_scores exists but no rating or empty")
+
+
+def get_agent_response(question: str, settings: dict) -> tuple[str, bool]:
     """
     Get response from agent with optional MLflow tracking.
+
+    Performs relevance check before calling the main agent to save costs.
 
     Args:
         question: User's question
         settings: Current app settings
 
     Returns:
-        Agent's response
+        Tuple of (response: str, is_relevant: bool)
     """
     agent = st.session_state.agent
 
+    # Pre-filter: Check if question is insect-related (saves costs!)
+    is_relevant, reason = agent.is_insect_related(question)
+
+    if not is_relevant:
+        # Return early without calling the expensive main agent
+        rejection_message = f"""I appreciate your question, but I can only answer questions about **insects** 🦋🐛🐝
+
+**Why this question doesn't qualify:** {reason}
+
+**Try asking about:**
+- Insect behavior and biology
+- Insect identification
+- Insect habitats and ecology
+- Insect life cycles
+- Common or rare insect species
+
+Feel free to ask me anything about insects!"""
+
+        if settings["enable_mlflow"]:
+            # Log the rejection for tracking
+            with mlflow.start_run():
+                mlflow.log_params({
+                    "model": agent.model,
+                    "question_length": len(question),
+                    "provider": settings["provider"],
+                    "interface": "streamlit",
+                    "rejected": True,
+                    "rejection_reason": reason,
+                })
+
+        return rejection_message, False
+
+    # Question is relevant, proceed with normal flow
     if settings["enable_mlflow"]:
         # Run with MLflow tracking
         with mlflow.start_run():
@@ -265,11 +413,16 @@ def get_agent_response(question: str, settings: dict) -> str:
                     "question_length": len(question),
                     "provider": settings["provider"],
                     "interface": "streamlit",
+                    "rejected": False,
                 }
             )
 
             # Get answer (with tracing)
             answer = agent.answer_question(question)
+
+            # Evaluate after trace is complete (if enabled)
+            if settings["enable_evaluation"]:
+                agent.evaluate_last_response(question=question, answer=answer)
 
             # Log metrics
             mlflow.log_metrics(
@@ -280,10 +433,16 @@ def get_agent_response(question: str, settings: dict) -> str:
                 }
             )
 
-            return answer
+            return answer, True
     else:
         # Run without MLflow tracking
-        return agent.answer_question(question)
+        answer = agent.answer_question(question)
+
+        # Evaluate after trace is complete (if enabled)
+        if settings["enable_evaluation"]:
+            agent.evaluate_last_response(question=question, answer=answer)
+
+        return answer, True
 
 
 # ============================================================================
@@ -297,6 +456,11 @@ def main():
 
     # Title and description
     st.title("🦋 Insect Expert Assistant")
+
+    # Show debug mode indicator if enabled
+    if DEBUG_MODE:
+        st.warning("🐛 **Debug Mode Enabled** - Evaluation details will be printed to console")
+
     st.markdown(
         """
         Ask me anything about insects! I'm an enthusiastic entomologist ready to answer
@@ -337,13 +501,85 @@ def main():
         with st.chat_message("assistant"):
             with st.spinner("Thinking..."):
                 try:
-                    response = get_agent_response(prompt, settings)
+                    response, is_relevant = get_agent_response(prompt, settings)
                     st.markdown(response)
 
-                    # Add assistant message to chat history
-                    st.session_state.messages.append(
-                        {"role": "assistant", "content": response}
-                    )
+                    # Display evaluation scores only if question was relevant and evaluation is enabled
+                    if is_relevant and settings["enable_evaluation"]:
+                        agent = st.session_state.agent
+
+                        if hasattr(agent, "last_eval_scores") and agent.last_eval_scores:
+                            scores = agent.last_eval_scores
+
+                            if scores and "rating" in scores:
+                                with st.expander("📊 Evaluation Results", expanded=True):
+                                    judge_name = (
+                                        settings["judge_model"]
+                                        .replace("databricks-", "")
+                                        .replace("-", " ")
+                                        .title()
+                                    )
+                                    st.caption(f"⚖️ Judge: **{judge_name}** (Databricks)")
+
+                                    # Display overall rating with color-coded emoji
+                                    rating = scores["rating"].lower()
+                                    rating_display = {
+                                        "excellent": ("🟢 Excellent", "green"),
+                                        "good": ("🟡 Good", "blue"),
+                                        "fair": ("🟠 Fair", "orange"),
+                                        "poor": ("🔴 Poor", "red"),
+                                    }
+
+                                    display_text, color = rating_display.get(
+                                        rating, ("⚪ Unknown", "gray")
+                                    )
+
+                                    # Show rating prominently
+                                    st.markdown(
+                                        f"### {display_text}",
+                                        help="Overall quality rating from custom LLM judge"
+                                    )
+
+                                    # Show rationale if available
+                                    if "rationale" in scores and scores["rationale"]:
+                                        st.markdown("**Judge's Analysis:**")
+                                        formatted_rationale = format_judge_analysis(scores["rationale"])
+                                        st.info(formatted_rationale)
+
+                    # Add assistant message to chat history with evaluation scores
+                    message_data = {"role": "assistant", "content": response}
+
+                    # Debug: Check conditions for storing eval scores
+                    if DEBUG_MODE:
+                        agent = st.session_state.agent
+                        print(f"[DEBUG] is_relevant: {is_relevant}")
+                        print(f"[DEBUG] enable_evaluation: {settings['enable_evaluation']}")
+                        print(f"[DEBUG] hasattr(agent, 'last_eval_scores'): {hasattr(agent, 'last_eval_scores')}")
+                        if hasattr(agent, "last_eval_scores"):
+                            print(f"[DEBUG] agent.last_eval_scores: {agent.last_eval_scores}")
+                            print(f"[DEBUG] bool(agent.last_eval_scores): {bool(agent.last_eval_scores)}")
+
+                    # Store evaluation scores with the message
+                    if is_relevant and settings["enable_evaluation"]:
+                        agent = st.session_state.agent
+                        if hasattr(agent, "last_eval_scores") and agent.last_eval_scores:
+                            message_data["eval_scores"] = agent.last_eval_scores.copy()
+
+                            # Debug: Show what's being stored
+                            if DEBUG_MODE:
+                                print(f"[DEBUG] ✅ Storing eval_scores in message: {message_data['eval_scores']}")
+                                print(f"[DEBUG] eval_scores keys: {list(message_data['eval_scores'].keys())}")
+                        elif DEBUG_MODE:
+                            print("[DEBUG] ❌ NOT storing eval_scores - last_eval_scores is empty or missing")
+
+                    st.session_state.messages.append(message_data)
+
+                    # Debug: Verify it was stored
+                    if DEBUG_MODE:
+                        last_msg = st.session_state.messages[-1]
+                        print(f"[DEBUG] Message appended. Has eval_scores: {'eval_scores' in last_msg}")
+                        if "eval_scores" in last_msg:
+                            print(f"[DEBUG] Stored eval_scores: {last_msg['eval_scores']}")
 
                 except Exception as e:
                     error_msg = f"Error: {e}"
