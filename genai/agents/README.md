@@ -93,7 +93,7 @@ uv run python genai/agents/insect_expert/tests/test_simplified_evaluation.py
 
 ### 4. View MLflow Traces
 
-# Open http://localhost:5000 → Traces tab
+Open http://localhost:5000 → Traces tab
 
 ---
 
