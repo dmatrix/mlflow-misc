@@ -9,23 +9,6 @@ from typing import Optional, Literal, Dict, Any
 
 
 @dataclass
-class ProviderConfig:
-    """
-    Provider-specific configuration.
-
-    Attributes:
-        name: Provider name (e.g., "openai", "databricks")
-        env_vars: Environment variables required by provider
-        models: Available models for this provider
-        default_model: Default model to use
-    """
-    name: str
-    env_vars: Dict[str, str] = field(default_factory=dict)
-    models: Dict[str, str] = field(default_factory=dict)
-    default_model: Optional[str] = None
-
-
-@dataclass
 class AgentConfig:
     """
     Standard agent configuration.
@@ -75,15 +58,22 @@ class AgentConfig:
 
     def __post_init__(self):
         """Validate configuration after initialization."""
+        import os
+
         # Validate temperature
         if not 0.0 <= self.temperature <= 2.0:
             raise ValueError(f"Temperature must be between 0.0 and 2.0, got {self.temperature}")
 
-        # Validate provider-specific requirements
+        # Auto-populate from environment variables if not provided
         if self.provider == "databricks":
-            if not self.databricks_host and not self.databricks_token:
-                # These can come from env vars, so just warn if both are missing
-                pass
+            if self.databricks_host is None:
+                self.databricks_host = os.environ.get("DATABRICKS_HOST")
+            if self.databricks_token is None:
+                self.databricks_token = os.environ.get("DATABRICKS_TOKEN")
+
+        if self.provider == "openai":
+            if self.api_key is None:
+                self.api_key = os.environ.get("OPENAI_API_KEY")
 
     def to_dict(self) -> Dict[str, Any]:
         """
