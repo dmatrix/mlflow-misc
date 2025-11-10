@@ -1,10 +1,15 @@
 """
 Test the simplified MLflow GenAI evaluation implementation.
 
-This script tests the inline evaluation pattern following MLflow documentation.
+This script tests the inline evaluation pattern using the refactored InsectExpertAgent.
 """
 import os
 import sys
+import mlflow
+
+from genai.common.config import AgentConfig, EvaluationConfig
+from genai.common.mlflow_config import setup_mlflow_tracking
+from genai.agents.insect_expert import InsectExpertAgent
 
 # Check for required environment variables
 required_vars = ["DATABRICKS_TOKEN", "DATABRICKS_HOST"]
@@ -21,25 +26,30 @@ print("\n" + "="*80)
 print("Testing Simplified MLflow GenAI Evaluation")
 print("="*80 + "\n")
 
-from genai.agents.insect_expert_openai import (
-    InsectExpertOpenAIAgent,
-    setup_mlflow_tracking,
-)
-import mlflow
-
 # Setup MLflow
 print("Setting up MLflow tracking...")
 setup_mlflow_tracking("test-simplified-evaluation")
 print("✓ MLflow configured\n")
 
-# Initialize agent with evaluation enabled
-print("Initializing agent with evaluation enabled...")
-agent = InsectExpertOpenAIAgent(
+# Create agent configuration
+print("Creating agent configuration...")
+config = AgentConfig(
     model="databricks-gemini-2-5-flash",
     temperature=1.0,
+    provider="databricks",
     enable_evaluation=True,
-    judge_model="databricks-gemini-2-5-flash",
+    debug=True,
 )
+
+# Create evaluation configuration
+eval_config = EvaluationConfig(
+    enabled=True,
+    judge_model="databricks-gemini-2-5-flash"
+)
+
+# Initialize agent
+print("Initializing agent with evaluation enabled...")
+agent = InsectExpertAgent(config=config, evaluation_config=eval_config)
 print("✓ Agent initialized\n")
 
 # Test question
@@ -50,11 +60,24 @@ print("Generating answer with inline evaluation...\n")
 
 # Run with MLflow tracking
 with mlflow.start_run():
+    # Log parameters
+    mlflow.log_params({
+        "model": agent.config.model,
+        "temperature": agent.config.temperature,
+        "provider": agent.config.provider,
+    })
+
     # Get answer (with tracing)
     answer = agent.answer_question(question)
 
     # Evaluate after trace is complete
-    agent.evaluate_last_response()
+    eval_scores = agent.evaluate_last_response(question=question, answer=answer)
+
+    # Log metrics
+    mlflow.log_metrics({
+        "answer_length": len(answer),
+        "answer_words": len(answer.split()),
+    })
 
     print("="*80)
     print("ANSWER:")
@@ -63,13 +86,13 @@ with mlflow.start_run():
     print()
 
     # Check evaluation scores
-    if agent.last_eval_scores:
+    if eval_scores:
         print("="*80)
         print("EVALUATION RESULTS:")
         print("="*80)
 
-        if "rating" in agent.last_eval_scores:
-            rating = agent.last_eval_scores["rating"]
+        if "rating" in eval_scores:
+            rating = eval_scores["rating"]
             rating_emoji = {
                 "excellent": "🟢",
                 "good": "🟡",
@@ -79,10 +102,10 @@ with mlflow.start_run():
             emoji = rating_emoji.get(rating.lower(), "⚪")
             print(f"\n{emoji} Rating: {rating.upper()}\n")
 
-        if "rationale" in agent.last_eval_scores:
+        if "rationale" in eval_scores:
             print("Judge's Rationale:")
             print("-" * 80)
-            print(agent.last_eval_scores["rationale"])
+            print(eval_scores["rationale"])
             print()
 
         print("="*80)
