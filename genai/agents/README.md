@@ -70,7 +70,10 @@ uv sync
 ### 3. Run the Agent
 
 **Interactive Streamlit UI:**
+# Start MLflow UI
 ```bash
+mlflow server --backend-store-uri sqlite:///mlflow.db --port 5000
+
 # Using uv run
 uv run streamlit run genai/agents/insect_expert/insect_agent_streamlit_app.py
 
@@ -83,17 +86,14 @@ uv run streamlit run genai/agents/insect_expert/insect_agent_streamlit_app.py --
 # Run test with evaluation
 export DATABRICKS_TOKEN='your-token'
 export DATABRICKS_HOST='your-host'
+# Start MLflow UI
+mlflow server --backend-store-uri sqlite:///mlflow.db --port 5000
 uv run python genai/agents/insect_expert/tests/test_simplified_evaluation.py
 ```
 
 ### 4. View MLflow Traces
 
-```bash
-# Start MLflow UI
-mlflow server --backend-store-uri sqlite:///mlflow.db --port 5000
-
 # Open http://localhost:5000 → Traces tab
-```
 
 ---
 
