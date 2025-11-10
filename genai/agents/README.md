@@ -67,7 +67,16 @@ export OPENAI_API_KEY='your-openai-api-key'
 uv sync
 ```
 
-### 3. Run the Agent
+### 3. Start MLflow Server (Required)
+
+```bash
+# Start MLflow server (in a separate terminal)
+mlflow server --backend-store-uri sqlite:///mlflow.db --port 5000
+
+# Keep this running - agents will log traces to http://localhost:5000
+```
+
+### 4. Run the Agent
 
 **Interactive Streamlit UI:**
 ```bash
@@ -80,19 +89,17 @@ uv run streamlit run genai/agents/insect_expert/insect_agent_streamlit_app.py --
 
 **Programmatic Usage:**
 ```bash
-# Run test with evaluation
+# IMPORTANT: Make sure MLflow server is running first (step 3)
 export DATABRICKS_TOKEN='your-token'
 export DATABRICKS_HOST='your-host'
 uv run python genai/agents/insect_expert/tests/test_simplified_evaluation.py
 ```
 
-### 4. View MLflow Traces
+### 5. View MLflow Traces
 
 ```bash
-# Start MLflow UI
-mlflow server --backend-store-uri sqlite:///mlflow.db --port 5000
-
 # Open http://localhost:5000 → Traces tab
+# The MLflow UI should already be running from step 3
 ```
 
 ---
