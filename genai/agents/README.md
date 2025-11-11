@@ -81,13 +81,16 @@ uv run streamlit run genai/agents/insect_expert/insect_agent_streamlit_app.py
 uv run streamlit run genai/agents/insect_expert/insect_agent_streamlit_app.py -- --debug
 ```
 
-**Programmatic Usage:**
+**Test Programmatic or CLI Usage:**
 ```bash
 # Run test with evaluation
 export DATABRICKS_TOKEN='your-token'
 export DATABRICKS_HOST='your-host'
+
 # Start MLflow UI
 mlflow server --backend-store-uri sqlite:///mlflow.db --port 5000
+# run the simple test to verify evaluation
+
 uv run python genai/agents/insect_expert/tests/test_simplified_evaluation.py
 ```
 
