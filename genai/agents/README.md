@@ -1,8 +1,9 @@
 # 🦋 GenAI Agents - MLflow Tracing and Evaluation
-
 An MLflow-based modular framework for building AI agents with **MLflow 3.x tracing** and **LLM-as-a-Judge evaluation**. Currently features the **Insect Expert Agent** as a reference implementation.
 
----
+![Insect Expert Assistant](images/insect_expert_assistant.gif)
+
+A modular framework for building AI agents with **MLflow 3.x tracing** and **LLM-as-a-Judge evaluation**. Currently features the **Insect Expert Agent** as a reference implementation.
 
 ## 🏗️ Architecture Overview
 
