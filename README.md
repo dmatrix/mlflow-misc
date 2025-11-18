@@ -69,9 +69,13 @@ mlflow-misc/
 │   └── __init__.py               # Utility imports & convenience functions
 ├── models/                        # Model-related utilities (future expansion)
 ├── genai/                         # GenAI/LLM utilities and agent examples
+│   ├── common/                    # Shared utilities (config, providers, MLflow setup)
 │   └── agents/
-│       ├── insect_expert_openai.py      # OpenAI/Databricks Foundation Model Serving endpoints agent class
-│       └── insect_expert_streamlit.py   # Interactive Streamlit chat UI
+│       └── insect_expert/         # Insect Expert Agent (refactored modular architecture)
+│           ├── agent.py           # Main agent class with MLflow tracing
+│           ├── evaluation.py      # LLM-as-a-Judge evaluator
+│           ├── prompts.py         # System and evaluation prompts
+│           └── insect_agent_streamlit_app.py  # Interactive Streamlit UI
 ├── pyproject.toml                 # UV project configuration with entry points
 └── README.md                      # This file - project overview
 ```
