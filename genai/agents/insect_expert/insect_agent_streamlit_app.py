@@ -379,7 +379,7 @@ def main():
         Ask me anything about insects! I'm an enthusiastic entomologist ready to answer
         your questions about insect classification, behavior, anatomy, and more.
 
-        *Powered by OpenAI/Databricks Foundation Model Serving endpoints + MLflow 3.x tracing*
+        *Powered by 🤖 OpenAI / 🧱 Databricks Foundation Model Serving + 🔗 MLflow 3.x tracing*
         """
     )
 
