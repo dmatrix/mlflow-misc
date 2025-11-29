@@ -23,9 +23,12 @@ uv run mlflow-tracking-example
 
 # Spark examples
 uv run mlflow-spark-synthetic        # Synthetic NYC taxi data
-uv run mlflow-spark-nyc-taxi         # Real NYC taxi data 
+uv run mlflow-spark-nyc-taxi         # Real NYC taxi data
 uv run mlflow-spark-langchain-ollama # Ollama + Spark + MLflow
 uv run mlflow-spark-llamaindex-rag   # LlamaIndex RAG with Spark
+
+# GenAI Agent examples
+uv run mlflow-tool-selection-judge   # LLM-as-a-judge for tool selection evaluation
 
 # View MLflow UI
 mlflow ui
