@@ -90,6 +90,7 @@ mlflow-spark-llamaindex-rag = "spark.spark_llamaindex_rag:main"
 mlflow-sample-documents = "utils.sample_documents:demo_sample_documents"
 mlflow-fact-checker = "genai.agents.fact_checker_agent:main"
 mlflow-tool-selection-judge = "genai.agents.tools_selection.tool_selection_judge:main"
+mlflow-agent-planning-judge = "genai.agents.agent_planning.agent_planning_judge:main"
 
 [build-system]
 requires = ["hatchling"]
