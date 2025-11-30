@@ -16,21 +16,21 @@ The LLM calls the tools via function calling. The executor orchestrates this pro
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│ 1. Agent creates plan (plain text, numbered steps)     │
-│    - LLM generates: "1. Search flights 2. Book flight" │
+│ 1. Agent creates plan (plain text, numbered steps)      │
+│    - LLM generates: "1. Search flights 2. Book flight"  │
 └─────────────────────────────────────────────────────────┘
                            ↓
 ┌─────────────────────────────────────────────────────────┐
-│ 2. Executor parses plan into steps                     │
+│ 2. Executor parses plan into steps                      │
 └─────────────────────────────────────────────────────────┘
                            ↓
 ┌─────────────────────────────────────────────────────────┐
 │ 3. FOR EACH STEP:                                       │
-│    a) LLM receives: step description, tool schemas,    │
+│    a) LLM receives: step description, tool schemas,     │
 │       context from previous steps                       │
-│    b) LLM uses function calling to select tool and     │
+│    b) LLM uses function calling to select tool and      │
 │       determine parameters                              │
-│    c) Executor calls the selected tool                 │
+│    c) Executor calls the selected tool                  │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -260,13 +260,55 @@ genai/agents/agent_planning/
     └── email_tools.py               # Email sending
 ```
 
+## Tutorial Formats Comparison
+
+### Quick Visual Comparison
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  📓 Jupyter Notebook          🐍 Python Script                      │
+│  (agent_planning_judge.ipynb) (agent_planning_judge.py)             │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  1. Load .env file ✓          1. Export env vars                    │
+│  2. Configure provider         2. Run: uv run mlflow-...            │
+│  3. Initialize judge           3. Single execution →                │
+│  4. Create plan                4. View result                       │
+│  5. Evaluate plan                                                   │
+│  6. Execute with tools ✓                                            │
+│  7. Try complete workflow ✓                                         │
+│  8. View prompts/schemas ✓                                          │
+│                                                                     │
+│  ✅ Interactive learning       ✅ Automation ready                  │
+│  ✅ Step-by-step execution     ✅ CI/CD integration                 │
+│  ✅ Easy experimentation       ✅ Scriptable                        │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Detailed Comparison
+
+| Feature | Jupyter Notebook | Python Script |
+|---------|------------------|---------------|
+| **Best For** | Learning & experimentation | Production & automation |
+| **Interactivity** | ✅ Run cells individually | ❌ Single execution |
+| **Credentials** | `.env` file (auto-loaded) | Environment variables |
+| **Workflow** | Plan → Evaluate → Execute | Complete workflow |
+| **Explanations** | Rich markdown with inline docs | Code comments |
+| **Tool Execution** | ✅ Step-by-step with output | ✅ Automated execution |
+| **Customization** | ✅ Easy to modify and re-run | Requires code edits |
+
+**Recommendation**: Start with the Jupyter notebook to understand the concepts, then use the Python script for automation.
+
 ## Next Steps
 
-- Implement custom tools by extending `BaseTool`
-- Create custom evaluation criteria by modifying judge instructions
-- Experiment with different LLM models for planning vs execution
-- Add retry logic and error recovery
-- Implement tool result caching for efficiency
+After completing this tutorial:
+1. **Explore MLflow UI**: Run `mlflow ui` to see detailed traces
+2. **Modify Prompts**: Edit `prompts.py` to change planning and evaluation criteria
+3. **Try Different Models**: Experiment with different LLM models for planning vs execution
+4. **Add Custom Tools**: Extend `BaseTool` to create your own tools
+5. **Implement Retry Logic**: Add error recovery for failed tool executions
+6. **Add Tool Caching**: Cache tool results to avoid redundant calls
+7. **Apply to Your Use Case**: Adapt this pattern for your own multi-step agent tasks
 
 ## References
 
