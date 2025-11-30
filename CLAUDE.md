@@ -29,6 +29,7 @@ uv run mlflow-spark-llamaindex-rag   # LlamaIndex RAG with Spark
 
 # GenAI Agent examples
 uv run mlflow-tool-selection-judge   # LLM-as-a-judge for tool selection evaluation
+uv run mlflow-agent-planning-judge   # Multi-step agent planning evaluation
 
 # View MLflow UI
 mlflow ui
