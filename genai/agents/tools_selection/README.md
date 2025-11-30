@@ -30,6 +30,94 @@ See [workflow diagrams](docs/workflow-diagram.md) for visual representations of:
 - LLM-as-a-Judge pattern sequence diagram
 - Side-by-side format comparison
 
+## Architecture: How LLM Selects Tools
+
+The agent uses LLM prompting to select the most appropriate tool for a given user query. The judge then evaluates this selection using LLM-as-a-Judge pattern.
+
+### Agent Selection Process
+
+```
+┌─────────────────────────────────────────────────────────┐
+│ 1. User Query                                            │
+│    - Input: "What's the weather in San Francisco?"      │
+└─────────────────────────────────────────────────────────┘
+                           ↓
+┌─────────────────────────────────────────────────────────┐
+│ 2. Agent Receives Query + Available Tools               │
+│    - User request: Query text                           │
+│    - Available tools: List of tool names                │
+│    - Prompt: Selection criteria from prompts.py         │
+└─────────────────────────────────────────────────────────┘
+                           ↓
+┌─────────────────────────────────────────────────────────┐
+│ 3. LLM Selects Tool (via select_tool method)            │
+│    - Model: Analyzes query + tool options               │
+│    - Output: Single tool name (e.g., "get_weather_api") │
+│    - Traced: @mlflow.trace() captures this decision     │
+└─────────────────────────────────────────────────────────┘
+                           ↓
+┌─────────────────────────────────────────────────────────┐
+│ 4. Judge Evaluates Selection (via evaluate method)      │
+│    - Input: MLflow trace of agent's decision            │
+│    - Judge: LLM analyzes if selection was appropriate   │
+│    - Output: "correct" or "incorrect" + reasoning       │
+└─────────────────────────────────────────────────────────┘
+```
+
+### Key Implementation Details
+
+The selection flow is implemented in [tool_selection_judge.py](tool_selection_judge.py):
+
+```python
+# Agent selects tool using LLM
+@mlflow.trace(span_type=SpanType.AGENT, name="select_tool")
+def select_tool(self, user_request: str, available_tools: List[str]) -> str:
+    # Get prompt with selection criteria
+    prompt = get_tool_selection_prompt(user_request, available_tools)
+
+    # LLM selects the most appropriate tool
+    response = self.client.chat.completions.create(
+        model=self.config.model,
+        messages=[{"role": "user", "content": prompt}],
+        max_tokens=50
+    )
+
+    tool_selected = response.choices[0].message.content.strip()
+    return tool_selected  # e.g., "get_weather_api"
+```
+
+**Important**: The agent doesn't use function calling here. Instead:
+- **Prompt-based selection**: LLM reads the query and available tools, then outputs a tool name
+- **Judge evaluates**: A separate LLM (the judge) assesses whether the selection was correct
+- **Traced decision**: MLflow captures the entire decision for evaluation
+
+### Judge Evaluation Process
+
+```python
+# Judge is created using make_judge()
+self.judge = make_judge(
+    name="tool_selection_quality",
+    instructions=get_judge_instructions(),  # Evaluation criteria
+    feedback_value_type=Literal["correct", "incorrect"],
+    model=judge_model
+)
+
+# Judge evaluates the agent's decision
+def evaluate(self, trace_id: str) -> Dict[str, Any]:
+    trace = mlflow.get_trace(trace_id)  # Get agent's decision trace
+    feedback = self.judge(trace=trace)   # Judge evaluates
+
+    return {
+        "is_correct": feedback.value == "correct",
+        "reasoning": feedback.rationale
+    }
+```
+
+**Key Differences from Agent Planning**:
+- **Agent Planning**: LLM uses function calling to dynamically select tools and execute them
+- **Tool Selection**: LLM outputs a tool name; judge evaluates if the choice was correct
+- **No Execution**: This tutorial focuses on evaluation, not tool execution
+
 ## Files
 
 - `tool_selection_judge.py` - Complete tutorial implementation with step-by-step comments
