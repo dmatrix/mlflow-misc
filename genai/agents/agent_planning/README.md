@@ -1,4 +1,4 @@
-# Agent Planning Tutorial
+# Multi-step Agent Planning Evaluation Tutorial
 
 This tutorial demonstrates multi-agent planning with tool execution and MLflow-based evaluation.
 
