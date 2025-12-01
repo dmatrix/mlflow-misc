@@ -7,7 +7,7 @@ This module provides:
 - Complete workflow: Plan → Execute → Evaluate
 """
 
-from genai.agents.agent_planning.agent_planning_judge import AgentPlanningJudge
+from genai.agents.agent_planning.agent_planning_judge_cls import AgentPlanningJudge
 from genai.agents.agent_planning.agent_planning_executor import AgentPlanningExecutor
 
 __all__ = ["AgentPlanningJudge", "AgentPlanningExecutor"]
