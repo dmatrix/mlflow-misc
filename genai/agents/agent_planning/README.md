@@ -218,6 +218,8 @@ evaluation = judge.evaluate(
 
 ## Running the Tutorial
 
+### Option A: Python CLI Script
+
 ```bash
 # Run with default settings (Databricks)
 uv run mlflow-agent-planning-judge
@@ -231,6 +233,149 @@ uv run mlflow-agent-planning-judge --backend sqlite --db-path ./mlflow.db
 # View results in MLflow UI
 mlflow ui
 ```
+
+**CLI Output Example:**
+```
+======================================================================
+TUTORIAL: Multi-Agent Planning with MLflow
+======================================================================
+
+[Step 1] Setting up MLflow tracking
+  └─ Experiment: agent-planning-judge
+  └─ View traces: mlflow ui
+
+[Step 2] Initializing Judge
+  └─ Provider: databricks
+  └─ Model: databricks-meta-llama-3-1-70b-instruct
+
+[Step 3] Defining Task
+  └─ Task: Book a flight from NYC to San Francisco for next week
+
+[Step 4] Agent creates a multi-step plan...
+  └─ ✓ Plan created:
+      1. Search for flights from NYC to San Francisco
+      2. Select a suitable flight
+      3. Book the selected flight
+      4. Send confirmation email
+
+[Step 5] Judge evaluates the plan quality...
+  └─ Quality: GOOD (Score: 4/5)
+  └─ Reasoning: Plan covers all necessary steps...
+
+[Step 6] Executing plan with actual tools...
+  └─ Executing 4 steps...
+  └─ Step 1/4: Search for flights from NYC to San Francisco
+     ✓ Used flight_search_api
+  └─ Step 2/4: Select a suitable flight
+  └─ Step 3/4: Book the selected flight
+     ✓ Used booking_api
+  └─ Step 4/4: Send confirmation email
+     ✓ Used email_api
+
+  ✓ Execution Complete!
+  └─ Total Steps: 4
+  └─ Successful: 3/4
+
+======================================================================
+```
+
+### Option B: Interactive Jupyter Notebook
+
+The notebook provides step-by-step execution with detailed explanations:
+
+**1. Setup and Configuration**
+```python
+# Cell 1-6: Environment setup
+# - Load .env file for credentials
+# - Configure provider (Databricks/OpenAI)
+# - Set models for agent and judge
+```
+
+**2. Initialize MLflow and Judge**
+```python
+# Cell 8: Setup MLflow tracing
+[Step 1] MLflow tracing enabled
+  └─ Experiment: agent-planning-notebook
+  └─ View traces: mlflow ui
+
+# Cell 10: Import AgentPlanningJudge
+✓ AgentPlanningJudge imported successfully
+
+# Cell 12: Initialize judge
+[Step 2] Initializing Agent and Judge
+  └─ Provider: databricks
+  └─ Agent Model: databricks-meta-llama-3-1-70b-instruct
+  └─ Judge Model: databricks-gemini-2-5-flash
+```
+
+**3. Plan Creation and Evaluation**
+```python
+# Cell 14: Define task scenario
+[Step 3] Define Planning Scenario
+  └─ Task: Book a flight from NYC to San Francisco
+  └─ Resources: flight_search_api, booking_api, email_api
+
+# Cell 18: Agent creates plan
+[Step 4] Agent creates a multi-step plan...
+  └─ ✓ Plan created:
+      1. Search for flights from NYC to SFO
+      2. Book the cheapest flight
+      3. Send confirmation email
+
+# Cell 20: Judge evaluates plan
+[Step 5] Judge evaluates the plan quality...
+[Step 6] Evaluation Results
+======================================================================
+Quality: GOOD (Score: 4/5)
+
+Detailed Assessment:
+The plan is well-structured and covers the essential steps...
+======================================================================
+```
+
+**4. Plan Execution with Tools**
+```python
+# Cell 22: Execute plan with actual tool calls
+[Step 7] Executing plan with actual tools...
+======================================================================
+
+  ✓ Execution Complete!
+  └─ Total Steps: 3
+  └─ Successful: 3/3
+
+  Step-by-Step Results:
+  ✓ Step 1: flight_search_api
+     Result: {'flights': [{'id': 'FL123', 'price': 250}...
+  ✓ Step 2: booking_api
+     Result: {'booking_id': 'BK789', 'status': 'confirmed'}...
+  ✓ Step 3: email_api
+     Result: {'status': 'sent', 'message_id': 'msg-456'}...
+======================================================================
+```
+
+**5. Complete Workflow Function**
+```python
+# Cell 24: Run complete workflow
+def run_complete_workflow(task: str, resources: List[str]):
+    """
+    Complete workflow: Plan → Evaluate → Execute
+    """
+    # Creates plan, evaluates quality, executes with tools
+    # All in one function call
+
+# Try different scenarios:
+result = run_complete_workflow(
+    task="Book flight and hotel for business trip",
+    resources=["flight_search_api", "hotel_search_api", "booking_api"]
+)
+```
+
+**Notebook Advantages:**
+- ✅ Step-by-step execution with immediate feedback
+- ✅ Easy to experiment with different tasks and resources
+- ✅ View intermediate results (plan text, evaluation scores)
+- ✅ Modify and re-run individual steps
+- ✅ Educational comments and explanations
 
 ## Key Concepts Demonstrated
 
