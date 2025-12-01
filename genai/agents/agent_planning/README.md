@@ -114,7 +114,7 @@ from genai.agents.agent_planning import AgentPlanningJudge
 
 config = AgentConfig(
     provider="databricks",
-    model="databricks-meta-llama-3-1-70b-instruct"
+    model="databricks-gpt-5"
 )
 
 judge = AgentPlanningJudge(config)
@@ -163,7 +163,7 @@ from genai.agents.agent_planning import AgentPlanningJudge
 # 1. Configure agent
 config = AgentConfig(
     provider="databricks",
-    model="databricks-meta-llama-3-1-70b-instruct"
+    model="databricks-gpt-5"
 )
 
 # 2. Create judge
@@ -246,7 +246,7 @@ TUTORIAL: Multi-Agent Planning with MLflow
 
 [Step 2] Initializing Judge
   └─ Provider: databricks
-  └─ Model: databricks-meta-llama-3-1-70b-instruct
+  └─ Model: databricks-gpt-5
 
 [Step 3] Defining Task
   └─ Task: Book a flight from NYC to San Francisco for next week
@@ -304,7 +304,7 @@ The notebook provides step-by-step execution with detailed explanations:
 # Cell 12: Initialize judge
 [Step 2] Initializing Agent and Judge
   └─ Provider: databricks
-  └─ Agent Model: databricks-meta-llama-3-1-70b-instruct
+  └─ Agent Model: databricks-gpt-5
   └─ Judge Model: databricks-gemini-2-5-flash
 ```
 
