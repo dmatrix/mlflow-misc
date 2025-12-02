@@ -38,7 +38,7 @@ The agent uses LLM prompting to select the most appropriate tool for a given use
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│ 1. User Query                                            │
+│ 1. User Query                                           │
 │    - Input: "What's the weather in San Francisco?"      │
 └─────────────────────────────────────────────────────────┘
                            ↓

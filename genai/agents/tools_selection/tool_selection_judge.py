@@ -150,6 +150,8 @@ After running, view traces in MLflow UI:
     # ========================================================================
     print("\n[Step 4] Agent selects a tool...")
     try:
+        # Call the agent to select a tool based on the user request and available tools
+        # This is the first call to LLM to select a tool based on the user task intent
         tool_selected = judge.select_tool(user_request, available_tools)
         print(f"  └─ ✓ Selected: {tool_selected}")
 
@@ -158,6 +160,10 @@ After running, view traces in MLflow UI:
         # ========================================================================
         print("\n[Step 5] Judge evaluates the selection...")
         trace_id = mlflow.get_last_active_trace_id()
+
+        # Call the LLM judge to evaluate the trace
+        # This is the second call to LLM to evaluate the tool selection
+        # The judge analyzes the trace and returns feedback
         result = judge.evaluate(trace_id)
 
         # ========================================================================
