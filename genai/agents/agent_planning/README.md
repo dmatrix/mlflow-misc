@@ -1,4 +1,4 @@
-# Multi-step Agent Planning Evaluation Tutorial
+# LLM-as-a-judge for Multi-step Agent Planning Evaluation Tutorial
 
 This tutorial demonstrates multi-agent planning with tool execution and MLflow-based evaluation.
 
