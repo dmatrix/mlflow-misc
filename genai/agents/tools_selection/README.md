@@ -125,15 +125,172 @@ def evaluate(self, trace_id: str) -> Dict[str, Any]:
 - `prompts.py` - All prompts (agent + judge instructions) - easy to customize
 - `__init__.py` - Package exports
 
-## Quick Start
+## Running the Tutorial
 
-### Option A: Interactive Jupyter Notebook (Recommended for Learning)
+### Option A: Python CLI Script
 
-The notebook provides an interactive learning experience with detailed explanations and multiple examples.
+```bash
+# Run with default settings (Databricks)
+uv run mlflow-tool-selection-judge
+
+# Run with OpenAI
+uv run mlflow-tool-selection-judge --provider openai --model gpt-4o-mini
+
+# Try your own query
+uv run mlflow-tool-selection-judge --query "Send email to John about the meeting"
+
+# Use a different model for the judge
+uv run mlflow-tool-selection-judge --judge-model databricks-claude-sonnet-4-5
+
+# Customize the experiment name
+uv run mlflow-tool-selection-judge --mlflow-experiment my-tutorial
+
+# Combine multiple options
+uv run mlflow-tool-selection-judge \
+  --provider openai \
+  --query "What's the current stock price?" \
+  --judge-model gpt-4o
+
+# View results in MLflow UI
+mlflow ui
+```
+
+**CLI Output Example:**
+```
+======================================================================
+TUTORIAL: LLM-as-a-Judge for AI Agent Tool Selection
+======================================================================
+
+[Step 1] Setting up MLflow tracking
+  └─ Experiment: tool-selection-judge
+  └─ View traces: mlflow ui
+
+[Step 2] Initializing Judge
+  └─ Provider: databricks
+  └─ Agent Model: databricks-gpt-5
+  └─ Judge Model: databricks-gemini-2-5-flash
+
+[Step 3] Testing Scenario
+  └─ Query: What's the weather like in San Francisco?
+  └─ Available Tools: ['get_weather_api', 'search_web', 'get_calendar', 'send_email']
+
+[Step 4] Agent selects tool...
+  └─ ✓ Tool selected: get_weather_api
+
+[Step 5] Judge evaluates the selection...
+  └─ Evaluation: CORRECT
+  └─ Reasoning: The agent correctly selected 'get_weather_api' as it directly addresses the weather query...
+
+======================================================================
+```
+
+**Environment Setup:**
+
+**For Databricks:**
+```bash
+export DATABRICKS_TOKEN='your-token'
+export DATABRICKS_HOST='https://your-workspace.cloud.databricks.com'
+```
+
+**For OpenAI:**
+```bash
+export OPENAI_API_KEY='sk-...'
+```
+
+### Option B: Interactive Jupyter Notebook
+
+The notebook provides step-by-step execution with detailed explanations:
+
+**1. Setup and Configuration**
+```python
+# Cell 1-3: Environment setup
+# - Load .env file for credentials
+# - Configure provider (Databricks/OpenAI)
+# - Set models for agent and judge
+```
+
+**2. Initialize MLflow and Judge**
+```python
+# Cell 5: Setup MLflow tracing
+[Step 1] MLflow tracing enabled
+  └─ Experiment: tool-selection-notebook
+  └─ View traces: mlflow ui
+
+# Cell 7: Import AgentToolSelectionJudge
+✓ AgentToolSelectionJudge imported successfully
+
+# Cell 9: Initialize judge
+[Step 2] Initializing Judge
+  └─ Provider: databricks
+  └─ Agent Model: databricks-gpt-5
+  └─ Judge Model: databricks-gemini-2-5-flash
+```
+
+**3. Run Single Example**
+```python
+# Cell 11: Define scenario
+[Step 3] Testing Scenario
+  └─ Query: What's the weather like in San Francisco?
+  └─ Tools: ['get_weather_api', 'search_web', 'get_calendar', 'send_email']
+
+# Cell 13: Agent selects tool
+[Step 4] Agent selects tool...
+  └─ ✓ Tool selected: get_weather_api
+
+# Cell 15: Judge evaluates
+[Step 5] Judge evaluates the selection...
+======================================================================
+Evaluation: CORRECT
+
+Reasoning:
+The agent correctly selected 'get_weather_api' as it directly
+addresses the user's weather query for San Francisco...
+======================================================================
+```
+
+**4. Batch Testing with Multiple Scenarios**
+```python
+# Cell 17: Run batch test with 4 scenarios
+[Step 6] Running batch test...
+======================================================================
+
+Scenario 1/4: Weather query
+  Query: What's the weather?
+  Selected: get_weather_api
+  ✓ CORRECT
+
+Scenario 2/4: Email task
+  Query: Send email to John
+  Selected: send_email
+  ✓ CORRECT
+
+Scenario 3/4: Calendar query
+  Query: What's on my schedule?
+  Selected: get_calendar
+  ✓ CORRECT
+
+Scenario 4/4: Web search
+  Query: Latest news about AI
+  Selected: search_web
+  ✓ CORRECT
+
+Results: 4/4 correct (100.0%)
+======================================================================
+```
+
+**5. Customization Examples**
+```python
+# Cell 19: View and modify prompts
+# - See agent selection prompt
+# - See judge evaluation criteria
+# - Try modifying prompts and re-running examples
+```
+
+**Notebook Setup:**
 
 **1. Install dependencies:**
 ```bash
-pip install python-dotenv  # Optional but recommended for credential management
+pip install python-dotenv  # Optional but recommended
 ```
 
 **2. Set up credentials:**
@@ -156,63 +313,13 @@ OPENAI_API_KEY=sk-your-key-here
 jupyter notebook tool_selection_judge.ipynb
 ```
 
-**4. Follow the tutorial:**
-- Run each cell sequentially
-- Try different queries in the interactive examples
-- Experiment with the batch testing scenarios
-
-**Notebook Features:**
-- ✅ Auto-loads credentials from `.env` file
-- ✅ Step-by-step explanations with educational comments
-- ✅ Interactive examples to try different queries
-- ✅ Batch testing with multiple scenarios
-- ✅ Customization examples showing how to modify prompts
-
-### Option B: Command-Line Script
-
-**Option 1: Using Databricks**
-```bash
-export DATABRICKS_TOKEN='your-token'
-export DATABRICKS_HOST='https://your-workspace.cloud.databricks.com'
-uv run mlflow-tool-selection-judge
-
-# View traces and results in MLflow UI
-mlflow ui
-```
-
-**Option 2: Using OpenAI**
-```bash
-export OPENAI_API_KEY='sk-...'
-uv run mlflow-tool-selection-judge --provider openai
-
-# View traces and results in MLflow UI
-mlflow ui
-```
-
-### Advanced Options
-
-```bash
-# Try your own query
-uv run mlflow-tool-selection-judge --query "Send email to John about the meeting"
-
-# Use a different model for the judge
-uv run mlflow-tool-selection-judge --judge-model databricks-claude-sonnet-4-5
-
-# Customize the experiment name
-uv run mlflow-tool-selection-judge --mlflow-experiment my-tutorial
-
-# Adjust temperature
-uv run mlflow-tool-selection-judge --temperature 0.5
-
-# Run with a different model
-uv run mlflow-tool-selection-judge --model gpt-4o --provider openai
-
-# Combine multiple options
-uv run mlflow-tool-selection-judge \
-  --provider openai \
-  --query "What's the current stock price?" \
-  --judge-model gpt-4o
-```
+**Notebook Advantages:**
+- ✅ Step-by-step execution with immediate feedback
+- ✅ Easy to experiment with different queries
+- ✅ View intermediate results (tool selection, evaluation)
+- ✅ Modify and re-run individual steps
+- ✅ Built-in batch testing with multiple scenarios
+- ✅ Educational comments and explanations
 
 ## Tutorial Walkthrough
 
