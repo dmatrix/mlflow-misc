@@ -1,4 +1,4 @@
-# LLM-as-a-Judge Tutorial with MLflow
+# LLM-as-a-Judge Tutorial Tool Selection Evaluation with MLflow
 
 A hands-on tutorial demonstrating how to use MLflow's LLM-as-a-Judge pattern to evaluate AI agent decisions.
 
