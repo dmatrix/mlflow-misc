@@ -38,33 +38,6 @@ The agent uses LLM prompting to select the most appropriate tool for a given use
 
 ![LLM-as-jugde: Tool evaluation workflow](images/tools_selection_notebook_diagram.png)
 
-```
-┌─────────────────────────────────────────────────────────┐
-│ 1. User Query                                           │
-│    - Input: "What's the weather in San Francisco?"      │
-└─────────────────────────────────────────────────────────┘
-                           ↓
-┌─────────────────────────────────────────────────────────┐
-│ 2. Agent Receives Query + Available Tools               │
-│    - User request: Query text                           │
-│    - Available tools: List of tool names                │
-│    - Prompt: Selection criteria from prompts.py         │
-└─────────────────────────────────────────────────────────┘
-                           ↓
-┌─────────────────────────────────────────────────────────┐
-│ 3. LLM Selects Tool (via select_tool method)            │
-│    - Model: Analyzes query + tool options               │
-│    - Output: Single tool name (e.g., "get_weather_api") │
-│    - Traced: @mlflow.trace() captures this decision     │
-└─────────────────────────────────────────────────────────┘
-                           ↓
-┌─────────────────────────────────────────────────────────┐
-│ 4. Judge Evaluates Selection (via evaluate method)      │
-│    - Input: MLflow trace of agent's decision            │
-│    - Judge: LLM analyzes if selection was appropriate   │
-│    - Output: "correct" or "incorrect" + reasoning       │
-└─────────────────────────────────────────────────────────┘
-```
 
 ### Key Implementation Details
 

@@ -16,26 +16,6 @@ The LLM calls the tools via function calling. The executor orchestrates this pro
 
 ![LLM-as-judge for mult-step agent evaluatoin workflow](images/agent_planning_notebook_diagram.png)
 
-```
-┌─────────────────────────────────────────────────────────┐
-│ 1. Agent creates plan (plain text, numbered steps)      │
-│    - LLM generates: "1. Search flights 2. Book flight"  │
-└─────────────────────────────────────────────────────────┘
-                           ↓
-┌─────────────────────────────────────────────────────────┐
-│ 2. Executor parses plan into steps                      │
-└─────────────────────────────────────────────────────────┘
-                           ↓
-┌─────────────────────────────────────────────────────────┐
-│ 3. FOR EACH STEP:                                       │
-│    a) LLM receives: step description, tool schemas,     │
-│       context from previous steps                       │
-│    b) LLM uses function calling to select tool and      │
-│       determine parameters                              │
-│    c) Executor calls the selected tool                  │
-└─────────────────────────────────────────────────────────┘
-```
-
 ### Key Implementation Details
 
 The execution flow is implemented in [agent_planning_executor.py](agent_planning_executor.py):
