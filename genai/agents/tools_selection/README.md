@@ -36,6 +36,8 @@ The agent uses LLM prompting to select the most appropriate tool for a given use
 
 ### Agent Selection Process
 
+![LLM-as-jugde: Tool evaluation workflow](images/tools_selection_notebook_diagram.png)
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ 1. User Query                                           │

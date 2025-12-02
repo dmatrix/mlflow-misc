@@ -14,6 +14,8 @@ This module showcases a complete workflow for AI agent planning:
 
 The LLM calls the tools via function calling. The executor orchestrates this process:
 
+![LLM-as-judge for mult-step agent evaluatoin workflow](images/agent_planning_notebook_diagram.png)
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ 1. Agent creates plan (plain text, numbered steps)      │
