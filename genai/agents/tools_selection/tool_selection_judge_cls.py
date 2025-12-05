@@ -126,6 +126,10 @@ class AgentToolSelectionJudge:
         if self.config.provider == "openai":
             api_params["temperature"] = 0.0
 
+        # Call the LLM to select a tool based on the user request and available tools
+        # The response is the tool selected by the LLM
+        # The tool selected is the tool that the LLM selected as the most appropriate tool for the user request
+
         response = self._call_llm(**api_params)
         tool_selected = response.choices[0].message.content.strip()
 

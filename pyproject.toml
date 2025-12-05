@@ -22,7 +22,7 @@ classifiers = [
     "Topic :: System :: Distributed Computing",
 ]
 dependencies = [
-    "mlflow>=3.6.0",
+    "mlflow>=3.7.0",
     "scikit-learn>=1.3.0",
     "pandas>=2.0.0",
     "numpy>=1.24.0",
@@ -91,6 +91,7 @@ mlflow-sample-documents = "utils.sample_documents:demo_sample_documents"
 mlflow-fact-checker = "genai.agents.fact_checker_agent:main"
 mlflow-tool-selection-judge = "genai.agents.tools_selection.tool_selection_judge:main"
 mlflow-agent-planning-judge = "genai.agents.agent_planning.agent_planning_judge:main"
+mlflow-multi-turn-support = "genai.agents.multi_turn.customer_support_agent:main"
 
 [build-system]
 requires = ["hatchling"]
