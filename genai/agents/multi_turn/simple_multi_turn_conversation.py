@@ -1,0 +1,218 @@
+"""
+Simple test of MLflow 3.7 session-level evaluation with Databricks endpoints.
+
+This is a minimal example to verify the {{ conversation }} template works
+with Databricks model endpoints before integrating into the full tutorial.
+"""
+
+import os
+import argparse
+import mlflow
+from mlflow.genai.judges import make_judge
+from openai import OpenAI
+
+# Conversation history keyed by session_id
+_conversation_history: dict[str, list[dict]] = {}
+
+SYSTEM_PROMPT = """You are a helpful customer support assistant. 
+You help users troubleshoot technical issues with their devices.
+Be concise but thorough in your responses."""
+
+
+@mlflow.trace(span_type="CHAT_MODEL")
+def simple_model(question: str, session_id: str, model: str = "databricks-gemini-2-5-flash") -> str:
+    """Traced model that makes LLM calls and maintains conversation history."""
+    mlflow.update_current_trace(metadata={"mlflow.trace.session": session_id})
+    
+    # Initialize or get conversation history for this session
+    if session_id not in _conversation_history:
+        _conversation_history[session_id] = [
+            {"role": "system", "content": SYSTEM_PROMPT}
+        ]
+    
+    # Add user message to history
+    _conversation_history[session_id].append({"role": "user", "content": question})
+    
+    # Make LLM call
+    client = OpenAI()
+    response = client.chat.completions.create(
+        model=model,
+        messages=_conversation_history[session_id],
+        max_tokens=500,
+    )
+    
+    assistant_message = response.choices[0].message.content
+    
+    # Add assistant response to history
+    _conversation_history[session_id].append({"role": "assistant", "content": assistant_message})
+    
+    return f"Answer to: {assistant_message}"
+
+
+def main(debug: bool = False):
+    """Test basic session-level evaluation with Databricks endpoints."""
+
+    # Set up Databricks environment for LiteLLM
+    databricks_host = os.environ.get("DATABRICKS_HOST")
+    databricks_token = os.environ.get("DATABRICKS_TOKEN")
+
+    if not databricks_host or not databricks_token:
+        print("ERROR: Set DATABRICKS_HOST and DATABRICKS_TOKEN environment variables")
+        return 1
+
+    # Configure for Databricks endpoints via LiteLLM
+    os.environ["OPENAI_API_KEY"] = databricks_token
+    os.environ["OPENAI_API_BASE"] = f"{databricks_host}/serving-endpoints"
+
+    print("="*70)
+    print("Testing MLflow 3.7 Session-Level Evaluation")
+    print("="*70)
+    print(f"\nDatabricks Host: {databricks_host}")
+    print("Judge Model: databricks-gemini-2-5-flash")
+
+    # Set experiment
+    mlflow.openai.autolog()
+    mlflow.set_tracking_uri("http://localhost:5000")
+    mlflow.set_experiment("multi-turn-simple-test")
+    # Run a simple conversation with follow-up questions
+    print("\n[Step 1] Running simple conversation...")
+    with mlflow.start_run() as run:
+        # Simulate a coherent 4-turn conversation about a printer issue
+        questions = [
+            "My HP printer won't turn on. The power light is completely off.",
+            "Yes, I checked the power cable and it's plugged in securely to both the printer and the outlet.",
+            "I tried a different outlet in another room and still nothing happens. What else can I try?",
+            "Okay, I'll contact HP support about the warranty. Thanks for your help troubleshooting!"
+        ]
+
+        print("  Session: conv_test_001")
+        print(f"  Turns: {len(questions)}\n")
+
+        for turn_num, q in enumerate(questions, 1):
+            response = simple_model(q, session_id="conv_test_001")
+            print(f"  Turn {turn_num}/{len(questions)}")
+            print(f"    User: {q}")
+            print(f"    Model: {response}\n")
+
+        # Search for traces in this run
+        print("\n[Step 2] Searching for traces...")
+        traces = mlflow.search_traces(
+            experiment_ids=[run.info.experiment_id],
+            filter_string=f'run_id = "{run.info.run_id}"'
+        )
+        print(f"  Found {len(traces)} traces")
+
+        # Create session-level judge using {{ conversation }} template
+        print("\n[Step 3] Creating session-level judge...")
+        judge = make_judge(
+            name="coherence",
+            model="openai:/databricks-gemini-2-5-flash",
+            instructions="""You are evaluating the coherence of a multi-turn conversation.
+
+Conversation to evaluate:
+{{ conversation }}
+
+Evaluate whether the conversation flows logically:
+- Do the messages build on previous context?
+- Are the follow-up questions relevant to earlier messages?
+- Does the conversation have a logical progression?
+- Is there consistency throughout the conversation?
+
+Return True if the conversation is coherent and flows naturally.
+Return False if there are significant coherence issues, contradictions, or non-sequiturs.""",
+            feedback_value_type=bool
+        )
+
+        print(f"  Judge is session-level: {judge.is_session_level_scorer}")
+
+        if not judge.is_session_level_scorer:
+            print("\n  WARNING: Judge is NOT session-level! Check MLflow version.")
+            return 1
+
+        # Evaluate the conversation
+        print("\n[Step 4] Evaluating conversation...")
+        try:
+            results = mlflow.genai.evaluate(data=traces, scorers=[judge])
+
+            # Check results
+            result_df = results.result_df
+
+            # Debug: Print available columns (only if debug flag is set)
+            if debug:
+                print(f"\nDEBUG: Available columns: {list(result_df.columns)}")
+                print(f"\nDEBUG: DataFrame shape: {result_df.shape}")
+                print(f"\nDEBUG: First few rows:\n{result_df.head()}")
+                print(f"\nDEBUG: Full DataFrame:\n{result_df}")
+
+            # Try to find the coherence columns (name might vary)
+            coherence_cols = [col for col in result_df.columns if 'coherence' in col.lower()]
+
+            if debug:
+                print(f"\nDEBUG: Coherence-related columns: {coherence_cols}")
+
+            if len(coherence_cols) == 0:
+                print("\n  ERROR: No coherence columns found in result DataFrame")
+                print(f"  All columns: {list(result_df.columns)}")
+                return 1
+
+            # Use the actual column names
+            value_col = [col for col in coherence_cols if 'value' in col or 'score' in col][0] if any('value' in col or 'score' in col for col in coherence_cols) else coherence_cols[0]
+            rationale_col = [col for col in coherence_cols if 'rationale' in col or 'justification' in col][0] if any('rationale' in col or 'justification' in col for col in coherence_cols) else None
+
+            if debug:
+                print(f"\nDEBUG: Using value_col: {value_col}")
+                print(f"DEBUG: Using rationale_col: {rationale_col}")
+                print(f"DEBUG: Values in {value_col}: {result_df[value_col].tolist()}")
+                if rationale_col:
+                    print(f"DEBUG: Values in {rationale_col}: {result_df[rationale_col].tolist()}")
+
+            # Get non-null assessments
+            assessments = result_df[value_col].notna().sum()
+            print(f"\n  Total rows in DataFrame: {len(result_df)}")
+            print(f"  Non-null assessments: {assessments}")
+
+            if assessments == 0:
+                print("\n  ERROR: No non-null coherence assessments found!")
+                print("  This suggests the session-level judge didn't produce results.")
+                print("  Check that judge.is_session_level_scorer is True")
+                return 1
+
+            # Find the first non-null value
+            non_null_indices = result_df[value_col].notna()
+            if non_null_indices.any():
+                first_valid_idx = result_df[non_null_indices].index[0]
+                coherence_value = result_df.loc[first_valid_idx, value_col]
+                coherence_rationale = result_df.loc[first_valid_idx, rationale_col] if rationale_col and rationale_col in result_df.columns else "N/A"
+
+                print(f"\n{'='*70}")
+                print("Results:")
+                print(f"{'='*70}")
+                print(f"  Assessments: {assessments} (expected: 1 for session-level)")
+                print(f"\n  Coherence: {coherence_value}")
+                print(f"  Rationale: {coherence_rationale}")
+
+                print(f"\n{'='*70}")
+                print("✓ SUCCESS: Session-level evaluation working!")
+                print(f"{'='*70}")
+                return 0
+            else:
+                print("\n  ERROR: Could not find valid coherence value")
+                return 1
+        except Exception as e:
+            print(f"\n✗ FAILED: {e}")
+            import traceback
+            traceback.print_exc()
+            return 1
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Test MLflow 3.7 session-level evaluation with Databricks endpoints"
+    )
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+        help="Enable debug output showing DataFrame columns and structure"
+    )
+    args = parser.parse_args()
+    exit(main(debug=args.debug))
