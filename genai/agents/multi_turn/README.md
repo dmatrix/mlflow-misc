@@ -2,6 +2,8 @@
 
 Tutorial demonstrating MLflow 3.7's session-level evaluation features for multi-turn conversations.
 
+![Multi-turn evaluation w/MLflwo 3.7 eval](images/ezgif.com-animated-gif-maker.gif)
+
 ## Overview
 
 This tutorial showcases:
