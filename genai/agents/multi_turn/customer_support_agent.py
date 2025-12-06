@@ -84,6 +84,11 @@ After running:
         default="all",
         help="Which scenario to run (default: all)"
     )
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+        help="Enable debug output"
+    )
 
     args = parser.parse_args()
 
@@ -107,7 +112,7 @@ After running:
 
     print("\n[Step 1] MLflow tracing enabled")
     print(f"  └─ Experiment: {args.mlflow_experiment}")
-    print(f"  └─ View traces: mlflow ui")
+    print("   └─ View traces: mlflow ui")
 
     # ========================================================================
     # STEP 2: Initialize Agent with Session-Level Judges
@@ -125,7 +130,7 @@ After running:
     print(f"  └─ Judge Model: {judge_model}")
     print(f"  └─ Temperature: {config.temperature}")
 
-    agent = CustomerSupportAgent(config, judge_model=judge_model)
+    agent = CustomerSupportAgent(config, judge_model=judge_model, debug=args.debug)
 
     # ========================================================================
     # STEP 3: Run Conversation Scenarios
@@ -175,14 +180,14 @@ After running:
                 coherence_label = "PASS" if eval_result['coherence']['passed'] else "FAIL"
                 print(f"\n📊 Coherence: {coherence_symbol} {coherence_label}")
                 print(f"   Value: {eval_result['coherence']['feedback_value']}")
-                print(f"   Rationale: {eval_result['coherence']['rationale'][:200]}...")
+                print(f"   Rationale: {eval_result['coherence']['rationale']}")
 
                 # Context retention results
                 retention_value = str(eval_result['context_retention']['feedback_value']).upper()
                 retention_score = eval_result['context_retention']['score']
                 print(f"\n🧠 Context Retention: {retention_value}")
                 print(f"   Score: {retention_score}/4")
-                print(f"   Rationale: {eval_result['context_retention']['rationale'][:200]}...")
+                print(f"   Rationale: {eval_result['context_retention']['rationale']}")
 
                 print(f"\n{'='*70}\n")
 

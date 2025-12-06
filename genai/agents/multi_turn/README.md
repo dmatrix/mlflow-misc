@@ -143,6 +143,9 @@ uv run mlflow-multi-turn-support --scenario printer
 # Use different models
 uv run mlflow-multi-turn-support --model databricks-gpt-5 --judge-model databricks-gemini-2-5-flash
 
+# Enable debug output to see DataFrame columns and evaluation details
+uv run mlflow-multi-turn-support --debug
+
 # View results
 mlflow ui
 ```
@@ -203,11 +206,11 @@ Evaluation Results: Printer Troubleshooting
 
 📊 Coherence: ✓ PASS
    Value: True
-   Rationale: The conversation flows logically from initial problem statement through systematic troubleshooting. The agent maintains consistent understanding of the HP LaserJet 3000 issue...
+   Rationale:
 
 🧠 Context Retention: EXCELLENT
    Score: 4/4
-   Rationale: Agent perfectly recalls the printer model (HP LaserJet 3000), remembers which troubleshooting steps were already attempted, and builds progressively on previous exchanges...
+   Rationale:
 
 ======================================================================
 
@@ -432,6 +435,26 @@ Verify:
 1. Judge is session-level: `judge.is_session_level_scorer == True`
 2. Passing `session=traces` not `trace=trace`
 3. Session has multiple traces (multi-turn conversation)
+
+### Rationale is empty
+
+**Known Issue**: MLflow's `make_judge()` with `mlflow.genai.evaluate()` currently only extracts the `value` field from judge responses, not rationales. The prompts request rationales in the format:
+
+```
+Provide your evaluation as:
+
+- Value: [your rating]
+- Rationale: [your explanation]
+```
+
+However, MLflow 3.7 doesn't automatically parse and extract the rationale text into a separate column. This is expected behavior.
+
+**Workaround**: For now, rationales remain empty in the evaluation output. The judges are providing values correctly (True/False for coherence, excellent/good/fair/poor for context retention).
+
+**Debug Mode**: Use `--debug` flag to see the full DataFrame structure and available columns:
+```bash
+uv run mlflow-multi-turn-support --debug
+```
 
 ## Next Steps
 

@@ -45,19 +45,21 @@ class CustomerSupportAgent:
     session-level (judge.is_session_level_scorer == True).
     """
 
-    def __init__(self, config: AgentConfig, judge_model: str = None):
+    def __init__(self, config: AgentConfig, judge_model: str = None, debug: bool = False):
         """
         Initialize the customer support agent and session-level judges.
 
         Args:
             config: Configuration for the agent model
             judge_model: Optional separate model for judging (defaults to agent model)
+            debug: Enable debug output (default: False)
         """
         # Initialize the agent's LLM client
         provider_kwargs = config.get_provider_kwargs()
         self.client = get_client(config.provider, **provider_kwargs)
         self.config = config
         self.judge_model = judge_model or config.model
+        self.debug = debug
 
         # Track conversation history per session
         self.session_histories = {}  # session_id -> List[Dict]
@@ -269,26 +271,40 @@ class CustomerSupportAgent:
         # Extract results from the evaluation DataFrame
         result_df = eval_results.result_df
 
-        # Debug: check available columns (MLflow 3.7 column naming)
-        print(f"  Available columns: {list(result_df.columns)}")
-
         # Find the actual column names (they might vary in MLflow 3.7)
         coherence_cols = [col for col in result_df.columns if 'coherence' in col.lower()]
         context_cols = [col for col in result_df.columns if 'context' in col.lower()]
 
         # Get coherence results (should be one row for session-level)
-        coherence_value_col = [col for col in coherence_cols if 'value' in col or 'score' in col]
-        coherence_rationale_col = [col for col in coherence_cols if 'rationale' in col or 'justification' in col]
+        coherence_value_col = [col for col in coherence_cols if '/value' in col]
+        coherence_rationale_col = [col for col in coherence_cols if '/justification' in col or '/rationale' in col]
 
-        coherence_values = result_df[coherence_value_col[0]].dropna() if coherence_value_col else result_df[coherence_cols[0]].dropna() if coherence_cols else []
+        coherence_values = result_df[coherence_value_col[0]].dropna() if coherence_value_col else []
         coherence_rationales = result_df[coherence_rationale_col[0]].dropna() if coherence_rationale_col else []
 
         # Get context retention results
-        context_value_col = [col for col in context_cols if 'value' in col or 'score' in col]
-        context_rationale_col = [col for col in context_cols if 'rationale' in col or 'justification' in col]
+        context_value_col = [col for col in context_cols if '/value' in col]
+        context_rationale_col = [col for col in context_cols if '/justification' in col or '/rationale' in col]
 
-        context_values = result_df[context_value_col[0]].dropna() if context_value_col else result_df[context_cols[0]].dropna() if context_cols else []
+        context_values = result_df[context_value_col[0]].dropna() if context_value_col else []
         context_rationales = result_df[context_rationale_col[0]].dropna() if context_rationale_col else []
+
+        # Debug output (only if debug mode enabled)
+        if self.debug:
+            print(f"  Available columns: {list(result_df.columns)}")
+            print("\n  DataFrame preview:")
+            print(result_df.head())
+            print(f"\n  DataFrame shape: {result_df.shape}")
+            print(f"\n  Coherence columns: {coherence_cols}")
+            print(f"  Context columns: {context_cols}")
+            print(f"\n  Coherence value columns: {coherence_value_col}")
+            print(f"  Coherence rationale columns: {coherence_rationale_col}")
+            print(f"  Coherence values: {coherence_values.tolist() if hasattr(coherence_values, 'tolist') else coherence_values}")
+            print(f"  Coherence rationales: {coherence_rationales.tolist() if hasattr(coherence_rationales, 'tolist') else coherence_rationales}")
+            print(f"\n  Context value columns: {context_value_col}")
+            print(f"  Context rationale columns: {context_rationale_col}")
+            print(f"  Context values: {context_values.tolist() if hasattr(context_values, 'tolist') else context_values}")
+            print(f"  Context rationales: {context_rationales.tolist() if hasattr(context_rationales, 'tolist') else context_rationales}")
 
         # Format results
         results = {

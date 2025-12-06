@@ -52,14 +52,15 @@ Evaluate whether the conversation flows logically:
 - Does the conversation follow a logical progression?
 - Are there any contradictions or confusing jumps?
 
-Return True if the conversation is coherent and flows naturally.
-Return False if there are significant coherence issues.
+Provide your evaluation as:
 
-Consider:
-- Context maintenance: Agent remembers what user said earlier
-- Logical flow: Each turn builds on previous turns
-- Relevance: Responses address the actual questions/issues raised
-- Consistency: No contradictions in advice or information
+- Value: True if the conversation is coherent and flows naturally, False if there are significant coherence issues.
+
+- Rationale: Explain your reasoning in 2-3 sentences. Consider:
+  - Context maintenance: Agent remembers what user said earlier
+  - Logical flow: Each turn builds on previous turns
+  - Relevance: Responses address the actual questions/issues raised
+  - Consistency: No contradictions in advice or information
 """
 
 
@@ -100,13 +101,15 @@ POOR:
 - Treats each turn independently
 - Significant repetition or contradictions
 
-Rate the conversation as: excellent, good, fair, or poor.
+Provide your evaluation as:
 
-Focus on:
-- Information recall: Does agent remember user's problem details?
-- Progressive assistance: Does troubleshooting build logically?
-- Avoiding repetition: No asking for info already provided
-- Continuity: Conversation feels connected, not fragmented
+- Value: Rate the conversation as excellent, good, fair, or poor.
+
+- Rationale: Explain your rating in 2-3 sentences. Focus on:
+  - Information recall: Does agent remember user's problem details?
+  - Progressive assistance: Does troubleshooting build logically?
+  - Avoiding repetition: No asking for info already provided
+  - Continuity: Conversation feels connected, not fragmented
 """
 
 
