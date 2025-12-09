@@ -67,7 +67,7 @@ class DatabricksClientFactory(ClientFactory):
         self,
         token: Optional[str] = None,
         host: Optional[str] = None,
-        profile: str = "DEFAULT",
+        profile: Optional[str] = None,
         **kwargs
     ) -> OpenAI:
         """
@@ -87,6 +87,7 @@ class DatabricksClientFactory(ClientFactory):
         """
         token = token or os.getenv("DATABRICKS_TOKEN")
         host = host or os.getenv("DATABRICKS_HOST")
+        profile = profile or os.getenv("DATABRICKS_PROFILE") or "DEFAULT"
 
         if not token:
             raise ValueError(
