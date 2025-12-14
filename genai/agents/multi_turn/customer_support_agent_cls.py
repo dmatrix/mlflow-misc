@@ -24,7 +24,7 @@ from genai.agents.multi_turn.prompts import (
     map_retention_to_score
 )
 import mlflow
-from mlflow.entities import SpanType
+from mlflow.entities import SpanType, assessment
 from mlflow.genai.judges import make_judge
 from typing import Dict, Any, List
 from typing_extensions import Literal
@@ -252,7 +252,7 @@ class CustomerSupportAgent:
         # Search for all traces in this session
         # Uses MLflow's built-in session filtering
         session_traces = mlflow.search_traces(
-            experiment_ids=[experiment.experiment_id],
+            locations=[experiment.experiment_id],
             filter_string=f"run_id = '{run_id}'"
         )
 

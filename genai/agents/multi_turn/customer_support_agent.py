@@ -61,7 +61,7 @@ After running:
     )
     parser.add_argument(
         "--model",
-        help="Model identifier (default: databricks-gpt-5 for databricks, gpt-4o-mini for openai)"
+        help="Model identifier (default: databricks-gpt-5-2 for databricks, gpt-4o-mini for openai)"
     )
     parser.add_argument(
         "--temperature",
@@ -94,7 +94,7 @@ After running:
 
     # Set model defaults
     if args.model is None:
-        args.model = "databricks-gpt-5" if args.provider == "databricks" else "gpt-4o-mini"
+        args.model = "databricks-gpt-5-2" if args.provider == "databricks" else "gpt-4o-mini"
 
     judge_model = args.judge_model or "databricks-gemini-2-5-flash"
 
