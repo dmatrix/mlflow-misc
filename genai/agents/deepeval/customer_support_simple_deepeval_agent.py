@@ -231,7 +231,7 @@ After running:
                     data=session_traces, scorers=[completeness_scorer]
                 )
                 print(f"Completeness metrics ✅: {results.metrics}")
-                print(f"Completeness score   📈: {results.metrics.get('ConversationCompleteness/mean')}")
+                print(f"Completeness score   📊: {results.metrics.get('ConversationCompleteness/mean')}")
                 print("--------------------------------")   
             except Exception as e:
                 print(f"\n✗ DeepEval evaluation failed: {e}")
