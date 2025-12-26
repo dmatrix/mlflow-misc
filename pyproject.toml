@@ -22,7 +22,7 @@ classifiers = [
     "Topic :: System :: Distributed Computing",
 ]
 dependencies = [
-    "mlflow>=3.7.0",
+    "mlflow>=3.8.0",
     "scikit-learn>=1.3.0",
     "pandas>=2.0.0",
     "numpy>=1.24.0",
@@ -41,6 +41,7 @@ dependencies = [
     "ollama>=0.6.0",
     "databricks-sdk>=0.20.0",
     "litellm>=1.0.0",
+    "deepeval>=1.0.0",
 ]
 
 [project.optional-dependencies]
@@ -92,6 +93,7 @@ mlflow-fact-checker = "genai.agents.fact_checker_agent:main"
 mlflow-tool-selection-judge = "genai.agents.tools_selection.tool_selection_judge:main"
 mlflow-agent-planning-judge = "genai.agents.agent_planning.agent_planning_judge:main"
 mlflow-multi-turn-support = "genai.agents.multi_turn.customer_support_agent:main"
+mlflow-deepeval-support = "genai.agents.deepeval.customer_support_deepeval_agent:main"
 
 [build-system]
 requires = ["hatchling"]

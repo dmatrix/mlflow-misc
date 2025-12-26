@@ -212,5 +212,8 @@ mlartifacts/
 mlflow.db
 *.db
 
+# DeepEval
+.deepeval/
+
 # Project-specific data files
 data/
