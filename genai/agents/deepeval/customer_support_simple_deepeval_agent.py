@@ -16,7 +16,7 @@ from genai.agents.multi_turn.scenarios import get_all_scenarios
 from genai.common.config import AgentConfig
 from genai.common.mlflow_config import setup_mlflow_tracking
 import mlflow
-from mlflow.genai.scorers.deepeval import ConversationCompleteness 
+from mlflow.genai.scorers.deepeval import ConversationCompleteness, KnowledgeRetention, TopicAdherence
 import argparse
 import os
 
@@ -172,8 +172,19 @@ After running:
             model=judge_model_uri,
             include_reason=True
         )
-        print("  ✓ Conversation Completeness Scorer initialized")
+        knowledge_retention_scorer = KnowledgeRetention(
+            model=judge_model_uri,
+            include_reason=True
+        )
+        topic_adherence_scorer = TopicAdherence(
+            model=judge_model_uri,
+            include_reason=True,
+            relevant_topics=["customer support", "technical help", "printer_problems", "account access"]
+        )
 
+        print("  ✓ Conversation Completeness Scorer initialized")
+        print("  ✓ Knowledge Retention Scorer initialized")
+        print("  ✓ Topic Adherence Scorer initialized")
     except AttributeError as e:
         print(
             "\n  ✗ Error: DeepEval scorers not available in mlflow.genai.deepeval"
@@ -228,10 +239,16 @@ After running:
 
                 # Evaluate using mlflow.genai.evaluate() with DeepEval scorers
                 results = mlflow.genai.evaluate(
-                    data=session_traces, scorers=[completeness_scorer]
+                    data=session_traces, scorers=[completeness_scorer, knowledge_retention_scorer, topic_adherence_scorer]
                 )
                 print(f"Completeness metrics ✅: {results.metrics}")
                 print(f"Completeness score   📊: {results.metrics.get('ConversationCompleteness/mean')}")
+                print("--------------------------------")   
+                print(f"Knowledge Retention metrics ✅: {results.metrics}")
+                print(f"Knowledge Retention score   📊: {results.metrics.get('KnowledgeRetention/mean')}")
+                print("--------------------------------")   
+                print(f"Topic Adherence metrics ✅: {results.metrics}")
+                print(f"Topic Adherence score   📊: {results.metrics.get('TopicAdherence/mean')}")
                 print("--------------------------------")   
             except Exception as e:
                 print(f"\n✗ DeepEval evaluation failed: {e}")
