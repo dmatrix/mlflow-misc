@@ -1,9 +1,8 @@
 # 🦋 GenAI Agents - MLflow Tracing and Evaluation
-An MLflow-based modular framework for building AI agents with **MLflow 3.x tracing** and **LLM-as-a-Judge evaluation**. Currently features the **Insect Expert Agent** as a reference implementation.
+
+An MLflow-based modular framework for building AI agents with **MLflow 3.x tracing**, **LLM-as-a-Judge evaluation**, and **DeepEval integration**. Features multiple reference implementations including conversation agents and specialized experts.
 
 ![Insect Expert Assistant](images/insect_expert_assistant.gif)
-
-A modular framework for building AI agents with **MLflow 3.x tracing** and **LLM-as-a-Judge evaluation**. Currently features the **Insect Expert Agent** as a reference implementation.
 
 ## 🏗️ Architecture Overview
 
@@ -11,19 +10,34 @@ A modular framework for building AI agents with **MLflow 3.x tracing** and **LLM
 
 ```
 genai/
-├── common/              # Shared utilities and configurations
-│   ├── config.py       # AgentConfig, EvaluationConfig dataclasses
-│   ├── providers.py    # Multi-provider client factory (OpenAI/Databricks)
-│   └── mlflow_config.py # MLflow tracking setup and run management
+├── common/                    # Shared utilities and configurations
+│   ├── config.py             # AgentConfig, EvaluationConfig dataclasses
+│   ├── providers.py          # Multi-provider client factory (OpenAI/Databricks)
+│   └── mlflow_config.py      # MLflow tracking setup and run management
 │
 └── agents/
-    └── insect_expert/   # Insect Expert Agent implementation
-        ├── agent.py            # Main agent class with MLflow tracing
-        ├── evaluation.py       # LLM-as-a-Judge evaluator
-        ├── prompts.py          # System and evaluation prompts
-        ├── insect_agent_streamlit_app.py  # Interactive web UI
-        └── tests/
-            └── test_simplified_evaluation.py
+    ├── insect_expert/         # Insect Expert Agent implementation
+    │   ├── agent.py           # Main agent class with MLflow tracing
+    │   ├── evaluation.py      # LLM-as-a-Judge evaluator
+    │   ├── prompts.py         # System and evaluation prompts
+    │   ├── insect_agent_streamlit_app.py  # Interactive web UI
+    │   └── tests/
+    │       └── test_simplified_evaluation.py
+    │
+    ├── multi_turn/            # Multi-turn conversation evaluation
+    │   ├── customer_support_agent_simple.py      # Conversation-only agent
+    │   ├── customer_support_agent_v2.ipynb       # Tutorial notebook (MLflow judges)
+    │   ├── scenarios.py       # Pre-built conversation scenarios
+    │   ├── prompts.py         # System and judge prompts
+    │   └── README.md          # Multi-turn conversation guide
+    │
+    ├── deepeval/              # DeepEval integration (MLflow 3.8+)
+    │   ├── customer_support_simple_deepeval_agent.py  # CLI with DeepEval scorers
+    │   ├── customer_support_deepeval_demo.ipynb       # Tutorial notebook (DeepEval)
+    │   └── README.md          # DeepEval integration guide
+    │
+    └── agent_planning/        # Multi-step agent planning evaluation
+        └── ...                # Agent planning examples
 ```
 
 ### Key Abstractions
@@ -224,23 +238,35 @@ curl -H "Authorization: Bearer $DATABRICKS_TOKEN" \
 
 ## 📖 Documentation
 
-**MLflow Resources:**
+### Agent-Specific Guides
+- **[Multi-Turn Conversations](./multi_turn/README.md)** - Session-level tracking and evaluation with MLflow judges
+- **[DeepEval Integration](./deepeval/README.md)** - Industry-standard conversational AI metrics (MLflow 3.8+)
+
+### MLflow Resources
 - [MLflow Tracing Guide](https://mlflow.org/docs/latest/llms/tracing/index.html)
 - [LLM-as-a-Judge](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/llm-judge/predefined/)
+- [MLflow DeepEval Integration](https://mlflow.org/docs/latest/genai/eval-monitor/scorers/deepeval-scorers/)
+- [Session Tracking](https://mlflow.org/docs/latest/genai/tracing/track-users-sessions/)
 
-**Databricks Resources:**
+### Databricks Resources
 - [Personal Access Token Guide](https://docs.databricks.com/en/dev-tools/auth/pat.html)
 - [Foundation Model APIs](https://docs.databricks.com/en/machine-learning/foundation-models/index.html)
+
+### DeepEval Resources
+- [DeepEval Documentation](https://docs.confident-ai.com/)
+- [Conversational Metrics](https://docs.confident-ai.com/docs/metrics-conversational)
 
 ---
 
 ## 🎯 Next Steps
 
 1. **Explore the Streamlit UI** - Interactive agent with live evaluation
-2. **Review MLflow Traces** - Understand agent behavior and performance
-3. **Experiment with Models** - Try different LLMs and evaluation judges
-4. **Build New Agents** - Use insect_expert as a template for custom agents
+2. **Try Multi-Turn Conversations** - Session-level evaluation with MLflow judges
+3. **Use DeepEval Metrics** - Industry-standard conversation quality metrics
+4. **Review MLflow Traces** - Understand agent behavior and performance
+5. **Experiment with Models** - Try different LLMs and evaluation judges
+6. **Build New Agents** - Use existing agents as templates for custom implementations
 
 ---
 
-Made with ❤️ using **MLflow 3.6** + **Databricks/OpenAI** + **Streamlit**
+Made with ❤️ using **MLflow 3.8+** + **DeepEval** + **Databricks/OpenAI** + **Streamlit**

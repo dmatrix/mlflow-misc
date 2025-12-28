@@ -30,6 +30,8 @@ uv run mlflow-spark-llamaindex-rag   # LlamaIndex RAG with Spark
 # GenAI Agent examples
 uv run mlflow-tool-selection-judge   # LLM-as-a-judge for tool selection evaluation
 uv run mlflow-agent-planning-judge   # Multi-step agent planning evaluation
+uv run mlflow-deepeval-support       # DeepEval integration demo
+uv run mlflow-insect-expert-streamlit # Insect Expert Streamlit app
 
 # View MLflow UI
 mlflow ui
@@ -70,7 +72,12 @@ uv pip install -e .
 - **`tracking/`** - Basic MLflow tracking examples with CLI backend switching
 - **`spark/`** - Distributed computing examples integrating Spark + MLflow
 - **`models/`** - Model-related utilities (future expansion)
-- **`genai/`** - GenAI/LLM utilities (future expansion)
+- **`genai/`** - GenAI/LLM utilities and agent examples
+  - **`common/`** - Shared utilities (config, providers, MLflow setup)
+  - **`agents/insect_expert/`** - Insect Expert Agent with Streamlit UI
+  - **`agents/multi_turn/`** - Multi-turn conversation with session-level evaluation
+  - **`agents/deepeval/`** - DeepEval integration for conversation evaluation
+  - **`agents/agent_planning/`** - Multi-step agent planning evaluation
 
 ### Key Design Patterns
 
@@ -105,12 +112,22 @@ Spark examples follow consistent structure:
 - Combine Spark MLlib with sklearn autolog for hybrid logging
 - Handle large-scale data processing with proper memory management
 
+#### GenAI Conversation Evaluation Pattern
+Conversation evaluation examples follow consistent structure:
+- Use `mlflow.update_current_trace(metadata={"mlflow.trace.session": session_id})` for session tagging
+- Use `mlflow.search_traces()` with session filter to aggregate conversation turns
+- Support both MLflow native judges (`make_judge()`) and DeepEval scorers
+- Extract results from evaluation DataFrames with `MetricName/value` and `MetricName/reason` columns
+- Provide both CLI programs and interactive Jupyter notebooks for learning
+
 ### Important Dependencies
-- **MLflow 3.3.2** - Core experiment tracking
+- **MLflow 3.8.0+** - Core experiment tracking with DeepEval integration
+- **DeepEval 1.0.0+** - Industry-standard conversational AI metrics
 - **PySpark 4.0.0** - Distributed computing
 - **UV** - Package management and project execution
 - **LangChain** - LLM integrations (optional)
 - **LlamaIndex** - RAG capabilities (optional)
+- **Streamlit** - Interactive UI for GenAI agents (optional)
 
 ### Entry Points Configuration
 All examples are executable via `pyproject.toml` scripts:

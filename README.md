@@ -2,7 +2,8 @@
 # 🚀 MLflow-Misc: Comprehensive MLflow Examples & Utilities
 
 [![Python](https://img.shields.io/badge/Python-3.9%2B-blue?logo=python&logoColor=white)](https://www.python.org/)
-[![MLflow](https://img.shields.io/badge/MLflow-3.3.2-orange?logo=mlflow&logoColor=white)](https://mlflow.org/)
+[![MLflow](https://img.shields.io/badge/MLflow-3.8.0%2B-orange?logo=mlflow&logoColor=white)](https://mlflow.org/)
+[![DeepEval](https://img.shields.io/badge/DeepEval-1.0.0%2B-blue?logo=python&logoColor=white)](https://docs.confident-ai.com/)
 [![Apache Spark](https://img.shields.io/badge/Apache%20Spark-4.0.0-orange?logo=apache-spark&logoColor=white)](https://spark.apache.org/)
 [![PySpark](https://img.shields.io/badge/PySpark-ML-orange?logo=apache-spark&logoColor=white)](https://spark.apache.org/docs/latest/api/python/)
 [![UV](https://img.shields.io/badge/UV-Package%20Manager-purple?logo=python&logoColor=white)](https://github.com/astral-sh/uv)
@@ -22,7 +23,7 @@
     Modern MLflow Practices & Educational Examples
 ```
 
-A comprehensive repository demonstrating **modern MLflow practices** for machine learning lifecycle management, featuring **autolog-first approaches**, **modular utilities**, **multiple backend store options**, **generative AI** capabilites, and much more coming soon...
+A comprehensive repository demonstrating **modern MLflow practices** for machine learning lifecycle management, featuring **autolog-first approaches**, **modular utilities**, **multiple backend store options**, **generative AI evaluation with DeepEval integration**, **multi-turn conversation tracking**, and much more coming soon...
 
 ## 🎯 Repository Purpose
 
@@ -71,11 +72,23 @@ mlflow-misc/
 ├── genai/                         # GenAI/LLM utilities and agent examples
 │   ├── common/                    # Shared utilities (config, providers, MLflow setup)
 │   └── agents/
-│       └── insect_expert/         # Insect Expert Agent (refactored modular architecture)
-│           ├── agent.py           # Main agent class with MLflow tracing
-│           ├── evaluation.py      # LLM-as-a-Judge evaluator
-│           ├── prompts.py         # System and evaluation prompts
-│           └── insect_agent_streamlit_app.py  # Interactive Streamlit UI
+│       ├── insect_expert/         # Insect Expert Agent (refactored modular architecture)
+│       │   ├── agent.py           # Main agent class with MLflow tracing
+│       │   ├── evaluation.py      # LLM-as-a-Judge evaluator
+│       │   ├── prompts.py         # System and evaluation prompts
+│       │   └── insect_agent_streamlit_app.py  # Interactive Streamlit UI
+│       ├── multi_turn/            # Multi-turn conversation with session-level evaluation
+│       │   ├── customer_support_agent_simple.py      # Conversation-only agent
+│       │   ├── customer_support_agent_v2.ipynb       # Tutorial notebook (MLflow judges)
+│       │   ├── scenarios.py       # Pre-built conversation scenarios
+│       │   ├── prompts.py         # System and judge prompts
+│       │   └── README.md          # Multi-turn conversation guide
+│       ├── deepeval/              # DeepEval integration for conversation evaluation
+│       │   ├── customer_support_simple_deepeval_agent.py  # CLI with DeepEval scorers
+│       │   ├── customer_support_deepeval_demo.ipynb       # Tutorial notebook (DeepEval)
+│       │   └── README.md          # DeepEval integration guide
+│       └── agent_planning/        # Multi-step agent planning evaluation
+│           └── ...                # Agent planning examples
 ├── pyproject.toml                 # UV project configuration with entry points
 └── README.md                      # This file - project overview
 ```
@@ -106,10 +119,20 @@ mlflow-misc/
 
 ### **GenAI Agent Examples**
 - **🦋 Insect Expert Streamlit App** - Interactive chat interface with Databricks Foundation Model Serving endpoints/OpenAI
+- **Multi-Turn Conversation Evaluation** - Session-level tracking and evaluation with MLflow judges
+- **DeepEval Integration** - Industry-standard conversational AI metrics (MLflow 3.8+)
 - **Multiple LLM Support** - GPT-5, Gemini 2.5 Flash, Claude Sonnet 4.5 via Databricks
 - **MLflow 3.x Tracing** - Full agent observability with `@mlflow.trace` decorators
 - **Secure Configuration** - Environment variable-based credential management
 - **Beautiful UI** - Production-ready Streamlit chat interface
+
+### **Conversation Evaluation Features**
+- **Session-Level Judges** - Evaluate entire conversations holistically
+- **DeepEval Scorers** - ConversationCompleteness, KnowledgeRetention, TopicAdherence
+- **MLflow Native Judges** - Custom judges with `make_judge()` API
+- **Tutorial Notebooks** - Interactive Jupyter notebooks with step-by-step guides
+- **CLI Programs** - Production-ready command-line tools for evaluation
+- **Result Extraction** - Parse and interpret evaluation results from DataFrames
 
 ### **Modular Utility System**
 - **Dynamic module loading** using `importlib.util`
@@ -192,6 +215,11 @@ export DATABRICKS_HOST='https://your-workspace.cloud.databricks.com'
 # Launch Insect Expert Streamlit App
 uv run mlflow-insect-expert-streamlit
 
+# Run conversation evaluation examples
+uv run mlflow-tool-selection-judge   # LLM-as-a-judge for tool selection
+uv run mlflow-agent-planning-judge   # Multi-step agent planning
+uv run mlflow-deepeval-support       # DeepEval integration demo
+
 # View results in MLflow UI
 mlflow ui
 ```
@@ -239,6 +267,8 @@ pipx install uv
 | **Spark Integration** | Distributed ML + LangChain NLP with Ollama models | [spark/README.md](./spark/README.md) |
 | **LlamaIndex RAG** | RAG system with Spark + LlamaIndex + MLflow integration | [README_LLAMA_RAG.md](./README_LLAMA_RAG.md) |
 | **🦋 GenAI Agents** | Interactive Streamlit chat app with Databricks Foundation Model Serving endpoints/OpenAI | [genai/agents/README.md](./genai/agents/README.md) |
+| **Multi-Turn Conversations** | Session-level tracking and evaluation with MLflow judges | [genai/agents/multi_turn/README.md](./genai/agents/multi_turn/README.md) |
+| **DeepEval Integration** | Industry-standard conversation metrics (MLflow 3.8+) | [genai/agents/deepeval/README.md](./genai/agents/deepeval/README.md) |
 | **Utility Modules** | Reusable MLflow components and helpers | [utils/](./utils/) |
 | **Project Configuration** | UV setup, dependencies, and entry points | [pyproject.toml](./pyproject.toml) |
 
