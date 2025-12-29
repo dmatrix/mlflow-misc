@@ -241,14 +241,14 @@ After running:
                 results = mlflow.genai.evaluate(
                     data=session_traces, scorers=[completeness_scorer, knowledge_retention_scorer, topic_adherence_scorer]
                 )
-                print(f"Completeness metrics ✅: {results.metrics}")
-                print(f"Completeness score   📊: {results.metrics.get('ConversationCompleteness/mean')}")
+                print(f"Completeness metrics        ✅: {results.metrics}")
+                print(f"Completeness score          📊: {results.metrics.get('ConversationCompleteness/mean')}")
                 print("--------------------------------")   
                 print(f"Knowledge Retention metrics ✅: {results.metrics}")
                 print(f"Knowledge Retention score   📊: {results.metrics.get('KnowledgeRetention/mean')}")
                 print("--------------------------------")   
-                print(f"Topic Adherence metrics ✅: {results.metrics}")
-                print(f"Topic Adherence score   📊: {results.metrics.get('TopicAdherence/mean')}")
+                print(f"Topic Adherence metrics     ✅: {results.metrics}")
+                print(f"Topic Adherence score       📊: {results.metrics.get('TopicAdherence/mean')}")
                 print("--------------------------------")   
             except Exception as e:
                 print(f"\n✗ DeepEval evaluation failed: {e}")
