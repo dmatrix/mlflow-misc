@@ -5,13 +5,14 @@ from databricks.sdk import WorkspaceClient
 # Databricks hosted foundation models
 # https://docs.databricks.com/en/machine-learning/foundation-models/supported-models.html
 SUPPORTED_MODELS = [
+    "databricks-gpt-5-mini",
     "databricks-gpt-5-2",
+    "databricks-claude-sonnet-4-5",
     "databricks-gemini-2-5-flash",
     "databricks-gemini-3-flash",
-    "databricks-claude-sonnet-4-5",
 ]
 
-DEFAULT_PROMPT = "What is MLflow? Answer in 2-3 sentences."
+DEFAULT_PROMPT = "What is MLflow? Answer in at most 2-3 sentences."
 
 
 def get_workspace_client():
@@ -37,7 +38,10 @@ def test_model(openai_client, model: str, prompt: str) -> None:
             messages=[{"role": "user", "content": prompt}],
             max_tokens=500,
         )
-        print(f"Response:\n{response.choices[0].message.content}")
+        if model == "databricks-gemini-3-flash":
+            print(f"Response:\n{response.choices[0].message.content[0]['text']}")
+        else:
+            print(f"Response:\n{response.choices[0].message.content}")
     except Exception as e:
         print(f"Error: {e}")
 

@@ -22,7 +22,7 @@ classifiers = [
     "Topic :: System :: Distributed Computing",
 ]
 dependencies = [
-    "mlflow>=3.8.0",
+    "mlflow>=3.9.0rc0",
     "scikit-learn>=1.3.0",
     "pandas>=2.0.0",
     "numpy>=1.24.0",
@@ -111,6 +111,11 @@ dev-dependencies = [
     "flake8>=6.0.0",
     "mypy>=1.5.0",
     "pre-commit>=3.0.0",
+]
+
+[tool.uv.workspace]
+members = [
+    "tutorials",
 ]
 
 [tool.black]
