@@ -2,7 +2,7 @@
 
 ## Tutorial 1: Getting Started with GenAI and MLflow
 
-This tutorial series teaches you how to use MLflow's open source platform for building, tracking, and debugging GenAI applications.
+This tutorial series teaches you how to use MLflow's open source platform for building, tracking, prompt registry, evaluating, and debugging GenAI applications.
 
 ### 📚 Tutorial Structure
 
