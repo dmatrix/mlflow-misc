@@ -33,10 +33,12 @@ This tutorial series teaches you how to use MLflow's open source platform for bu
 - Debugging with traces
 - Multi-step agentic patterns
 
-#### Notebook 1.5: Prompt Management (15-20 min)
-*(Coming next)*
+#### Notebook 1.5: Prompt Management (15-20 min
 - Creating prompt templates
 - Versioning prompts
+- Registering in the Prompt Registery
+- Searching Prompt Registry
+- Using prompts from the Prompt Registry
 - Linking prompts to experiments
 
 #### Notebook 1.6: Framework Integrations (10 min)
