@@ -54,6 +54,7 @@ This tutorial series teaches you how to use MLflow's open source platform for bu
 - Session-level multi-turn evaluation
 
 #### Notebook 1.8: Complete RAG Application (25-30 min)
+*(Coming next)*
 - Building a full RAG pipeline
 - End-to-end tracing
 - Performance analysis
