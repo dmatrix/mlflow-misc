@@ -20,14 +20,12 @@ This tutorial series teaches you how to use MLflow's open source platform for bu
 - Parent-child runs for workflows
 
 #### Notebook 1.3: Introduction to Tracing (30-35 min)
-*(Coming next)*
 - Auto-tracing with MLflow
 - Understanding the trace model
-- Manual instrumentation
+- Manual instrumentation 
 - Viewing traces in UI
 
 #### Notebook 1.4: Manual Tracing and Advanced Observability (30-35 min)
-*(Coming next)*
 - Custom span decorators
 - Tracing complex workflows
 - Debugging with traces
@@ -36,7 +34,7 @@ This tutorial series teaches you how to use MLflow's open source platform for bu
 #### Notebook 1.5: Prompt Management (15-20 min
 - Creating prompt templates
 - Versioning prompts
-- Registering in the Prompt Registery
+- Registering in the Prompt Registry
 - Searching Prompt Registry
 - Using prompts from the Prompt Registry
 - Linking prompts to experiments
@@ -47,11 +45,20 @@ This tutorial series teaches you how to use MLflow's open source platform for bu
 - LangChain integration
 - LlamaIndex integration
 
-#### Notebook 1.7: Complete RAG Application (20-25 min)
+#### Notebook 1.7: Evaluating Agents (25-30 min)
 *(Coming next)*
+- LLM-as-Judge evaluation patterns
+- MLflow built-in scorers (RelevanceToQuery, Correctness, Guidelines)
+- Custom scorers with @scorer decorator
+- DeepEval integration for conversations
+- Session-level multi-turn evaluation
+
+#### Notebook 1.8: Complete RAG Application (25-30 min)
 - Building a full RAG pipeline
 - End-to-end tracing
 - Performance analysis
+- RAG evaluation with RAGAS metrics
+
 
 ### 🚀 Getting Started
 
