@@ -62,7 +62,7 @@ pip install mlflow>=2.10.0 openai python-dotenv jupyter
 Create a `.env` file:
 ```
 OPENAI_API_KEY=your-api-key-here
-MLFLOW_TRACKING_URI=./mlruns
+MLFLOW_TRACKING_URI="http://localhost:5000
 ```
 
 3. **Start Jupyter**
@@ -93,7 +93,7 @@ By the end of Tutorial 1, you will:
 - ✅ Track LLM experiments systematically
 - ✅ Implement comprehensive tracing for observability
 - ✅ Debug GenAI applications using trace visualizations
-- ✅ Manage prompts with version control
+- ✅ Manage prompts with version control and Prompt Registery
 - ✅ Build production-ready RAG applications
 
 ### 📂 Directory Structure
@@ -102,13 +102,12 @@ By the end of Tutorial 1, you will:
 mlflow-genai-tutorial-1/
 ├── 01_setup_and_introduction.ipynb
 ├── 02_experiment_tracking.ipynb
-├── 03_introduction_to_tracing.ipynb     (coming soon)
-├── 04_manual_tracing_advanced.ipynb     (coming soon)
-├── 05_prompt_management.ipynb           (coming soon)
+├── 03_introduction_to_tracing.ipynb     
+├── 04_manual_tracing_advanced.ipynb     
+├── 05_prompt_management.ipynb           
 ├── 06_framework_integrations.ipynb      (coming soon)
 ├── 07_complete_rag_application.ipynb    (coming soon)
 ├── .env                                  (create this)
-├── mlruns/                               (created automatically)
 └── README.md
 ```
 
