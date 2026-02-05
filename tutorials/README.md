@@ -39,11 +39,12 @@ This tutorial series teaches you how to use MLflow's open source platform for bu
 - Using prompts from the Prompt Registry
 - Linking prompts to experiments
 
-#### Notebook 1.6: Framework Integrations (10 min)
-*(Coming next)*
-- OpenAI integration
-- LangChain integration
-- LlamaIndex integration
+#### Notebook 1.6: Framework Integrations (15-20 min)
+- OpenAI direct API integration
+- LangChain chains and workflows
+- LlamaIndex document indexing and RAG
+- Framework comparison matrix
+- Best practices for each framework
 
 #### Notebook 1.7: Evaluating Agents (25-30 min)
 *(Coming next)*
@@ -152,11 +153,11 @@ mlflow-genai-tutorial-1/
 ├── 03_introduction_to_tracing.ipynb     
 ├── 04_manual_tracing_advanced.ipynb     
 ├── 05_prompt_management.ipynb           
-├── 06_framework_integrations.ipynb      (coming soon)
+├── 06_framework_integrations.ipynb      
 ├── 07_evaluating_agents.ipynb           (coming soon)
 ├── 08_complete_rag_application.ipynb    (coming soon)
 ├── 09_multiagent_orchestration.ipynb    (coming soon)
-├── .env                                  (create this)
+├── .env                                 (create this yourself and use the template env_template)
 └── README.md
 ```
 
