@@ -51,50 +51,87 @@ This tutorial series teaches you how to use MLflow's open source platform for bu
 - End-to-end tracing
 - Performance analysis
 
+
+## 🎓 Learning Outcomes
+
+After completing this tutorial, you will be able to:
+
+### Core Skills
+- ✅ Set up MLflow for GenAI development
+- ✅ Track LLM experiments systematically
+- ✅ Implement comprehensive tracing
+- ✅ Debug GenAI applications effectively
+- ✅ Manage prompts with version control
+- ✅ Build production-ready RAG systems
+
+### Advanced Capabilities
+- ✅ Cost tracking and optimization
+- ✅ Performance analysis and debugging
+- ✅ Multi-framework integration
+- ✅ Hierarchical trace creation
+- ✅ Custom span instrumentation
+- ✅ Agent workflow tracing
+
+### Production Skills
+- ✅ Error handling and recovery
+- ✅ Caching strategies
+- ✅ Validation patterns
+- ✅ Monitoring and alerting
+- ✅ Team collaboration patterns
+
+
 ### 🚀 Getting Started
 
-1. **Install Dependencies**
+This project uses [UV](https://docs.astral.sh/uv/) for dependency management.
+
+1. **Install UV** (if not already installed)
 ```bash
-pip install mlflow>=2.10.0 openai python-dotenv jupyter
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-2. **Configure API Keys**
-Create a `.env` file:
+2. **Install Dependencies**
+```bash
+uv sync
+```
+
+3. **Configure API Keys**
+Create a `.env` file in the tutorials directory:
 ```
 OPENAI_API_KEY=your-api-key-here
-MLFLOW_TRACKING_URI="http://localhost:5000
+MLFLOW_TRACKING_URI=http://localhost:5000
 ```
 
-3. **Start Jupyter**
+4. **Start Jupyter**
 ```bash
-jupyter notebook
+uv run jupyter notebook
 ```
 
-4. **Start MLflow UI** (in a separate terminal)
+5. **Start MLflow UI** (in a separate terminal)
 ```bash
-mlflow ui --port 5000
+uv run mlflow ui --port 5000
 ```
 
-5. **Open Browser**
+6. **Open Browser**
 Navigate to http://localhost:5000
 
 ### 📋 Prerequisites
 
-- Python 3.8+
-- OpenAI API key
+- Python 3.10+
+- [UV](https://docs.astral.sh/uv/) package manager
+- OpenAI API key (or Databricks Workspace)
 - Basic understanding of Python and LLMs
-- Jupyter Notebook or JupyterLab
 
 ### 🎯 Learning Objectives
 
-By the end of Tutorial 1, you will:
+By the end of all tutorials, you will:
 
 - ✅ Understand MLflow's core GenAI components
-- ✅ Track LLM experiments systematically
+- ✅ Track and trace LLM experiments systematically
 - ✅ Implement comprehensive tracing for observability
-- ✅ Debug GenAI applications using trace visualizations
+- ✅ Debug GenAI applications using trace visualizations and MLflow Assistant
 - ✅ Manage prompts with version control and Prompt Registery
-- ✅ Build production-ready RAG applications
+- ✅ Evaluate an agent using MLflow predefined judges, custom and integrated judges from DeepEval and RAGAS
+- ✅ Build end-to-end production-ready RAG applications
 
 ### 📂 Directory Structure
 
@@ -106,7 +143,9 @@ mlflow-genai-tutorial-1/
 ├── 04_manual_tracing_advanced.ipynb     
 ├── 05_prompt_management.ipynb           
 ├── 06_framework_integrations.ipynb      (coming soon)
-├── 07_complete_rag_application.ipynb    (coming soon)
+├── 07_evaluating_agents.ipynb           (coming soon)
+├── 08_complete_rag_application.ipynb    (coming soon)
+├── 09_multiagent_orchestration.ipynb    (coming soon)
 ├── .env                                  (create this)
 └── README.md
 ```
@@ -117,13 +156,6 @@ mlflow-genai-tutorial-1/
 - [MLflow GenAI Guide](https://mlflow.org/docs/latest/genai/)
 - [MLflow GitHub](https://github.com/mlflow/mlflow)
 - [MLflow Community](https://mlflow.org/community/)
-
-### 🎓 Next Tutorial Series
-
-- **Tutorial 2**: Prompt Engineering and Version Control
-- **Tutorial 3**: Tracing and Debugging LLM and Agentic Workflows
-- **Tutorial 4**: Evaluating Agents with MLflow
-- **Tutorial 5**: Optimizing Prompts for Performance and Better Results
 
 ### 💡 Tips
 
@@ -138,7 +170,7 @@ mlflow-genai-tutorial-1/
 **Issue**: MLflow UI won't start
 ```bash
 # Try a different port
-mlflow ui --port 5001
+uv run mlflow ui --port 5001
 ```
 
 **Issue**: API key not recognized
@@ -151,19 +183,28 @@ os.environ["OPENAI_API_KEY"] = "your-key"
 
 **Issue**: Module not found
 ```bash
-pip install mlflow openai python-dotenv --upgrade
+# Sync dependencies with UV
+uv sync
+
+# Or install specific package
+uv add mlflow openai python-dotenv
 ```
 
 ### 📝 License
 
 This tutorial series is provided as educational content for learning MLflow's GenAI capabilities.
 
-### 🤝 Contributing
+---
 
-Feedback and suggestions welcome! Please open an issue or submit a pull request.
+## 📝 Feedback & Contributions
+
+- Found an issue? Open a GitHub issue
+- Have suggestions? Submit a pull request
+- Want to share? Tag us on social media
+- Questions? Check the MLflow community
 
 ---
 
-**Author**: Jules (Databricks Developer Relations)
+**Authors**: Jules (Databricks Developer Relations) + Claude Code
 **Date**: January 2025
-**MLflow Version**: 2.10.0+
+**MLflow Version**: 3.9.0+
