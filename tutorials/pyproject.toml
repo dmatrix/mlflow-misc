@@ -11,12 +11,15 @@ dependencies = [
     "langchain-openai",
     "matplotlib>=3.7.0",
     "mlflow>=3.8.0",
+    "nest-asyncio>=1.6.0",
     "numpy>=1.24.0",
     "openai>=1.0.0",
     "pandas>=2.0.0",
     "python-dotenv>=1.0.0",
     "langchain>=1.2.7",
     "llama-index>=0.14.13",
+    "ragas>=0.4.3",
+    "litellm>=1.81.5",
 ]
 
 [dependency-groups]

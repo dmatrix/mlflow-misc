@@ -154,7 +154,7 @@ mlflow-genai-tutorial-1/
 ├── 04_manual_tracing_advanced.ipynb     
 ├── 05_prompt_management.ipynb           
 ├── 06_framework_integrations.ipynb      
-├── 07_evaluating_agents.ipynb           (coming soon)
+├── 07_evaluating_agents.ipynb           
 ├── 08_complete_rag_application.ipynb    (coming soon)
 ├── 09_multiagent_orchestration.ipynb    (coming soon)
 ├── .env                                 (create this yourself and use the template env_template)
