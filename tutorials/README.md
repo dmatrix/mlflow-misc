@@ -47,7 +47,6 @@ This tutorial series teaches you how to use MLflow's open source platform for bu
 - Best practices for each framework
 
 #### Notebook 1.7: Evaluating Agents (25-30 min)
-*(Coming next)*
 - LLM-as-Judge evaluation patterns
 - MLflow built-in scorers (RelevanceToQuery, Correctness, Guidelines)
 - Custom scorers with @scorer decorator
@@ -55,13 +54,10 @@ This tutorial series teaches you how to use MLflow's open source platform for bu
 - Session-level multi-turn evaluation
 
 #### Notebook 1.8: Complete RAG Application (25-30 min)
-*(Coming next)*
 - Building a full RAG pipeline
 - End-to-end tracing
 - Performance analysis
 - RAG evaluation with RAGAS metrics
-
-
 
 ## 🎓 Learning Outcomes
 
@@ -82,13 +78,6 @@ After completing this tutorial, you will be able to:
 - ✅ Hierarchical trace creation
 - ✅ Custom span instrumentation
 - ✅ Agent workflow tracing
-
-### Production Skills
-- ✅ Error handling and recovery
-- ✅ Caching strategies
-- ✅ Validation patterns
-- ✅ Monitoring and alerting
-- ✅ Team collaboration patterns
 
 
 ### 🚀 Getting Started
