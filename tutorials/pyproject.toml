@@ -19,6 +19,7 @@ dependencies = [
     "langchain>=1.2.7",
     "llama-index>=0.14.13",
     "ragas>=0.4.3",
+    "gepa>=0.0.18",
     "litellm>=1.81.5",
 ]
 
