@@ -1,8 +1,10 @@
 # MLflow GenAI Tutorial Series
 
+![MLflow tutorial series](images/1_Mastering-GenAI-with-MLflow.png)
+
 ## Tutorial 1: Getting Started with GenAI and MLflow
 
-This tutorial series teaches you how to use MLflow's open source platform for building, tracking, prompt registry, evaluating, and debugging GenAI applications.
+This tutorial series teaches you how to use MLflow's open source platform for building, tracking, tracing, prompt registry and optimizaiton, evaluating, and debugging GenAI applications.
 
 ### 📚 Tutorial Structure
 
@@ -31,7 +33,7 @@ This tutorial series teaches you how to use MLflow's open source platform for bu
 - Debugging with traces
 - Multi-step agentic patterns
 
-#### Notebook 1.5: Prompt Management (15-20 min
+#### Notebook 1.5: Prompt Management (15-20 min)
 - Creating prompt templates
 - Versioning prompts
 - Registering in the Prompt Registry
@@ -53,6 +55,12 @@ This tutorial series teaches you how to use MLflow's open source platform for bu
 - DeepEval integration for conversations
 - Session-level multi-turn evaluation
 
+#### Notebook 1.8: Prompt Optimization with GEPA (10-15 min)
+- Automatic prompt optimization with GEPA algorithm
+- MLflow Prompt Registry integration
+- Before/after evaluation comparison
+
+#### Notebook 1.9: Complete RAG Application (25-30 min)
 #### Notebook 1.8: Complete RAG Application (25-30 min)
 - Building a full RAG pipeline
 - End-to-end tracing
@@ -132,6 +140,7 @@ By the end of all tutorials, you will:
 - ✅ Manage prompts with version control and Prompt Registery
 - ✅ Evaluate an agent using MLflow predefined judges, custom and integrated judges from DeepEval and RAGAS
 - ✅ Build end-to-end production-ready RAG applications
+- ✅ Build and evaluate multi-agent orchestration systems
 
 ### 📂 Directory Structure
 
@@ -143,9 +152,9 @@ mlflow-genai-tutorial-1/
 ├── 04_manual_tracing_advanced.ipynb     
 ├── 05_prompt_management.ipynb           
 ├── 06_framework_integrations.ipynb      
-├── 07_evaluating_agents.ipynb           
-├── 08_complete_rag_application.ipynb    (coming soon)
-├── 09_multiagent_orchestration.ipynb    (coming soon)
+├── 07_evaluating_agents.ipynb
+├── 08_prompt_optimization.ipynb
+├── 09_complete_rag_application.ipynb
 ├── .env                                 (create this yourself and use the template env_template)
 └── README.md
 ```
