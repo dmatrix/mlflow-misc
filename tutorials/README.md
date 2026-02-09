@@ -61,7 +61,6 @@ This tutorial series teaches you how to use MLflow's open source platform for bu
 - Before/after evaluation comparison
 
 #### Notebook 1.9: Complete RAG Application (25-30 min)
-#### Notebook 1.8: Complete RAG Application (25-30 min)
 - Building a full RAG pipeline
 - End-to-end tracing
 - Performance analysis
@@ -77,7 +76,7 @@ After completing this tutorial, you will be able to:
 - ✅ Implement comprehensive tracing
 - ✅ Debug GenAI applications effectively
 - ✅ Manage prompts with version control
-- ✅ Build production-ready RAG systems
+- ✅ Build RAG systems
 
 ### Advanced Capabilities
 - ✅ Cost tracking and optimization
@@ -139,7 +138,7 @@ By the end of all tutorials, you will:
 - ✅ Debug GenAI applications using trace visualizations and MLflow Assistant
 - ✅ Manage prompts with version control and Prompt Registery
 - ✅ Evaluate an agent using MLflow predefined judges, custom and integrated judges from DeepEval and RAGAS
-- ✅ Build end-to-end production-ready RAG applications
+- ✅ Build end-to-end RAG applications
 - ✅ Build and evaluate multi-agent orchestration systems
 
 ### 📂 Directory Structure
