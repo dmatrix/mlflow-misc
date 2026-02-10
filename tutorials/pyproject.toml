@@ -21,6 +21,8 @@ dependencies = [
     "ragas>=0.4.3",
     "gepa>=0.0.18",
     "litellm>=1.81.5",
+    "openai-agents>=0.8.2",
+    "datasets>=4.5.0",
 ]
 
 [dependency-groups]
