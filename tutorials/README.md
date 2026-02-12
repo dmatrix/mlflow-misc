@@ -2,7 +2,7 @@
 
 ![MLflow tutorial series](images/1_Mastering-GenAI-with-MLflow.png)
 
-## Tutorial: Mastering GenAI with MLflow Series
+## Tutorial: Mastering GenAI with MLflow 
 
 This tutorial series teaches you how to use MLflow's open source platform for building, tracking, tracing, prompt registry, and optimization, evaluating, and debugging GenAI applications.
 
